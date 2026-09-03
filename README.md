@@ -17,31 +17,58 @@ The plugin main thread owns the `figma` global but has no network access, and th
 plugin UI iframe has network access but no `figma` global. The bridge uses both:
 the UI holds the socket, the main thread does the work, `postMessage` joins them.
 
-## Setup
-
-### 1. Install the plugin in Figma
-
-Figma desktop app → menu → **Plugins → Development → Import plugin from manifest…**
-→ pick `plugin/manifest.json` from this repo.
-
-This requires the desktop app; the browser version cannot import local plugins.
-
-### 2. Register the MCP server
-
-The project ships a `.mcp.json`, so running `claude` from this directory picks the
-server up automatically. To use it from any directory instead:
+## Quick start
 
 ```bash
-claude mcp add open-figma-mcp --scope user -- node /Users/macbookpro/Documents/playground/claude-figma/mcp/server.js
+# 1. Register the plugin in Figma desktop (quits and relaunches Figma once)
+npx -y open-figma-mcp install-plugin
+
+# 2. Register the MCP server with your client
+claude mcp add open-figma-mcp --scope user -- npx -y open-figma-mcp
 ```
 
-### 3. Connect
-
-1. Open the Figma file you want to work on.
-2. **Plugins → Development → Open Figma MCP**. It auto-connects; the dot turns green.
-3. In Claude Code, run `figma_status` to confirm.
+Then open a Figma file, run **Plugins → Development → Open Figma MCP**, and call
+`figma_status` from your MCP client. The dot in the plugin window turns green
+when the bridge is connected.
 
 Leave the plugin window open — closing it drops the socket. Reopening reconnects.
+
+### What `install-plugin` does
+
+Figma desktop keeps its development plugins in a local `settings.json`
+(`~/Library/Application Support/Figma/` on macOS, `%APPDATA%\Figma\` on
+Windows). The command copies the plugin to `~/.open-figma-mcp/plugin/`, quits
+Figma, adds the plugin to that file, writes a `.bak-open-figma-mcp` backup next
+to it, and relaunches Figma. The plugin then shows up under
+**Plugins → Development** without the manual import step.
+
+Flags: `--no-quit` (you close Figma yourself), `--no-relaunch`.
+`npx open-figma-mcp uninstall-plugin` reverses it.
+
+If the settings file cannot be found or Figma will not quit, the command falls
+back to printing the manifest path so you can use
+**Plugins → Development → Import plugin from manifest…** instead. That path
+always works; only the desktop app can load a local development plugin.
+
+### Other MCP clients
+
+Any client that speaks stdio MCP works. Cursor / Windsurf / Claude Desktop:
+
+```json
+{
+  "mcpServers": {
+    "open-figma-mcp": {
+      "command": "npx",
+      "args": ["-y", "open-figma-mcp"]
+    }
+  }
+}
+```
+
+### From a clone
+
+`npm install`, then the shipped `.mcp.json` makes `claude` pick the server up
+when run from this directory. `npm start` runs the server directly.
 
 ## Tools
 
@@ -121,7 +148,7 @@ No Figma instance required.
 | `BRIDGE_PORT` | `3055` | WebSocket port the plugin dials. |
 | `BRIDGE_TIMEOUT` | `30000` | Milliseconds before a pending command gives up. |
 
-Change the port in both `.mcp.json` and the plugin's URL field if 3055 is taken.
+Change the port in both your MCP client config (`BRIDGE_PORT`) and the plugin's URL field if 3055 is taken.
 
 ## Limits
 

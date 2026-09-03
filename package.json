@@ -1,16 +1,32 @@
 {
   "name": "open-figma-mcp",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Self-hosted, harness-agnostic Figma MCP server — unlimited tool calls via your own Figma plugin",
   "type": "module",
   "bin": {
-    "open-figma-mcp": "./mcp/server.js"
+    "open-figma-mcp": "./bin/cli.js"
   },
+  "files": [
+    "bin/",
+    "mcp/",
+    "plugin/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "node test/smoke.js && node test/multi-client.js",
-    "start": "node mcp/server.js",
-    "dev": "BRIDGE_LOG=1 node mcp/server.js"
+    "start": "node bin/cli.js",
+    "dev": "BRIDGE_LOG=1 node bin/cli.js"
   },
+  "keywords": ["figma", "mcp", "model-context-protocol", "claude", "cursor", "plugin"],
+  "author": "pradityaaldi",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pradityaaldi/open-figma-mcp.git"
+  },
+  "homepage": "https://github.com/pradityaaldi/open-figma-mcp#readme",
+  "bugs": "https://github.com/pradityaaldi/open-figma-mcp/issues",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
     "ws": "^8.18.0"
