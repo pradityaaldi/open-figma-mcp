@@ -1,0 +1,21 @@
+{
+  "name": "open-figma-mcp",
+  "version": "1.0.0",
+  "description": "Self-hosted, harness-agnostic Figma MCP server — unlimited tool calls via your own Figma plugin",
+  "type": "module",
+  "bin": {
+    "open-figma-mcp": "./mcp/server.js"
+  },
+  "scripts": {
+    "test": "node test/smoke.js && node test/multi-client.js",
+    "start": "node mcp/server.js",
+    "dev": "BRIDGE_LOG=1 node mcp/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

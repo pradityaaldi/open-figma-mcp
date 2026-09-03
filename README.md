@@ -1,0 +1,138 @@
+# Open Figma MCP
+
+A self-hosted replacement for Figma's official MCP server. It talks to Figma
+through a local development plugin instead of Figma's cloud API, so the Starter
+plan's 20-calls-per-month quota does not apply.
+
+```
+Claude Code  <--stdio-->  mcp/server.js  <--ws://localhost:3055-->  plugin/ui.html
+                                                                          |
+                                                                    postMessage
+                                                                          |
+                                                                    plugin/code.js
+                                                                    (figma global)
+```
+
+The plugin main thread owns the `figma` global but has no network access, and the
+plugin UI iframe has network access but no `figma` global. The bridge uses both:
+the UI holds the socket, the main thread does the work, `postMessage` joins them.
+
+## Setup
+
+### 1. Install the plugin in Figma
+
+Figma desktop app → menu → **Plugins → Development → Import plugin from manifest…**
+→ pick `plugin/manifest.json` from this repo.
+
+This requires the desktop app; the browser version cannot import local plugins.
+
+### 2. Register the MCP server
+
+The project ships a `.mcp.json`, so running `claude` from this directory picks the
+server up automatically. To use it from any directory instead:
+
+```bash
+claude mcp add open-figma-mcp --scope user -- node /Users/macbookpro/Documents/playground/claude-figma/mcp/server.js
+```
+
+### 3. Connect
+
+1. Open the Figma file you want to work on.
+2. **Plugins → Development → Open Figma MCP**. It auto-connects; the dot turns green.
+3. In Claude Code, run `figma_status` to confirm.
+
+Leave the plugin window open — closing it drops the socket. Reopening reconnects.
+
+## Tools
+
+| Tool | What it does |
+| --- | --- |
+| `figma_exec` | Run arbitrary Plugin API JavaScript. This is the workhorse. |
+| `figma_screenshot` | Export a node as PNG, returned inline. |
+| `figma_get_metadata` | Structural outline — ids, names, types, sizes, text. |
+| `figma_get_selection` | What the user has selected right now. |
+| `figma_get_pages` | List document pages. |
+| `figma_set_page` | Switch the active page. |
+| `figma_status` | Connection state plus the open file and page. |
+
+### Writing `figma_exec` code
+
+The body is wrapped in an async function, so `await` and `return` both work at the
+top level. The returned value is the only output channel — `console.log` is not
+captured.
+
+```js
+await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
+
+const frame = figma.createFrame();
+frame.resize(400, 300);
+frame.fills = [{ type: 'SOLID', color: color('#101828') }];
+figma.currentPage.appendChild(frame);
+
+return { createdNodeIds: [frame.id] };
+```
+
+Three helpers are injected:
+
+- `color('#2B5CFF')` — hex to Figma's 0–1 RGB.
+- `await loadFontsFor(textNode)` — loads every font a text node already uses,
+  which is what you need before editing existing text.
+- `outline(node, depth)` — structural dump of a subtree.
+
+The Plugin API rules that cause most failures:
+
+- Colors are 0–1, not 0–255.
+- Load fonts before touching any text node.
+- `fills` and `strokes` are read-only arrays — build a new array and reassign.
+- Switch pages with `await figma.setCurrentPageAsync(page)`; the sync setter throws.
+- `figma.notify()` is not available in this environment.
+- Set `layoutSizingHorizontal` / `layoutSizingVertical` only after `appendChild`.
+
+## Verify before relying on it
+
+`figma_exec` compiles the incoming string with `new Function`. Figma's plugin
+sandbox is expected to allow this — it is how scripting plugins such as Scripter
+work — but it has not been exercised against a live Figma instance in this repo.
+The first thing to run after connecting is:
+
+```
+figma_exec: return 1 + 1
+```
+
+If that returns `2`, dynamic execution works and every other tool follows. If it
+throws about `Function` or `eval`, the sandbox is blocking compilation and the
+plugin needs a fixed command set (`create_frame`, `set_fill`, …) instead of
+arbitrary code.
+
+## Tests
+
+```bash
+node test/smoke.js
+```
+
+Spawns the MCP server, attaches a fake plugin over WebSocket, and exercises the
+full request path — including a plugin-side throw and a mid-session disconnect.
+No Figma instance required.
+
+## Configuration
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `BRIDGE_PORT` | `3055` | WebSocket port the plugin dials. |
+| `BRIDGE_TIMEOUT` | `30000` | Milliseconds before a pending command gives up. |
+
+Change the port in both `.mcp.json` and the plugin's URL field if 3055 is taken.
+
+## Limits
+
+- One Figma file at a time — whichever file has the plugin open.
+- The plugin window must stay open.
+- Long-running scripts hit `BRIDGE_TIMEOUT`; split large jobs into several calls.
+- Only the desktop app can load a local development plugin.
+
+## Relationship to the official server
+
+This does not replace everything Figma's own MCP server does. Code Connect,
+design-system search across published libraries, and Figma Make support all live
+in the official server and are not reimplemented here. What this covers is
+reading and writing the file that is open in front of you, without a quota.

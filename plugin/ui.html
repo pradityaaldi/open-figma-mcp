@@ -1,0 +1,131 @@
+<style>
+  body {
+    font: 12px -apple-system, "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 16px;
+    color: var(--figma-color-text);
+    background: var(--figma-color-bg);
+  }
+  h1 { font-size: 13px; margin: 0 0 12px; }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #d33; flex: none; }
+  .dot.on { background: #1a9e5c; }
+  input {
+    width: 100%; box-sizing: border-box; padding: 6px 8px; border-radius: 5px;
+    border: 1px solid var(--figma-color-border);
+    background: var(--figma-color-bg-secondary); color: var(--figma-color-text);
+  }
+  button {
+    padding: 6px 12px; border-radius: 5px; border: none; cursor: pointer;
+    background: var(--figma-color-bg-brand); color: var(--figma-color-text-onbrand);
+  }
+  #log {
+    margin-top: 10px; height: 96px; overflow: auto; font-family: ui-monospace, monospace;
+    font-size: 10px; line-height: 1.5; color: var(--figma-color-text-secondary);
+    white-space: pre-wrap; word-break: break-all;
+  }
+</style>
+
+<h1>Open Figma MCP</h1>
+<div class="row"><span class="dot" id="dot"></span><span id="state">disconnected</span></div>
+<input id="url" value="ws://localhost:3055" />
+<div class="row" style="margin-top:10px">
+  <button id="toggle">Connect</button>
+  <label style="font-size:11px"><input type="checkbox" id="auto" checked style="width:auto" /> auto-reconnect</label>
+</div>
+<div id="log"></div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  let ws = null;
+  let retry = null;
+  let manualStop = false;
+
+  function log(msg) {
+    const el = $('log');
+    el.textContent += msg + '\n';
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function setState(connected, label) {
+    $('dot').className = connected ? 'dot on' : 'dot';
+    $('state').textContent = label;
+    $('toggle').textContent = connected ? 'Disconnect' : 'Connect';
+  }
+
+  function connect() {
+    manualStop = false;
+    clearTimeout(retry);
+    try {
+      ws = new WebSocket($('url').value);
+    } catch (e) {
+      log('bad url: ' + e.message);
+      return;
+    }
+
+    ws.onopen = () => {
+      setState(true, 'connected');
+      log('connected');
+      ws.send(JSON.stringify({ type: 'hello', role: 'plugin' }));
+    };
+
+    ws.onmessage = (ev) => {
+      let msg;
+      try {
+        msg = JSON.parse(ev.data);
+      } catch (e) {
+        return;
+      }
+      if (!msg.command) return;
+      log('→ ' + msg.command);
+      // Hand off to the main thread, which owns the `figma` global.
+      parent.postMessage({ pluginMessage: msg }, '*');
+    };
+
+    ws.onclose = () => {
+      setState(false, 'disconnected');
+      if (!manualStop && $('auto').checked) {
+        retry = setTimeout(connect, 2000);
+      }
+    };
+
+    ws.onerror = () => log('socket error');
+  }
+
+  // Results come back from code.js; PNG bytes arrive as a number array and are
+  // base64-encoded here because the plugin sandbox has no btoa.
+  const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  function toBase64(arr) {
+    let out = '';
+    for (let i = 0; i < arr.length; i += 3) {
+      const a = arr[i], b = arr[i + 1], c = arr[i + 2];
+      out += B64[a >> 2];
+      out += B64[((a & 3) << 4) | (b === undefined ? 0 : b >> 4)];
+      out += b === undefined ? '=' : B64[((b & 15) << 2) | (c === undefined ? 0 : c >> 6)];
+      out += c === undefined ? '=' : B64[c & 63];
+    }
+    return out;
+  }
+
+  window.onmessage = (ev) => {
+    const msg = ev.data.pluginMessage;
+    if (!msg || msg.type !== 'result') return;
+    if (msg.ok && msg.data && Array.isArray(msg.data.bytes)) {
+      msg.data = { base64: toBase64(msg.data.bytes), meta: msg.data.meta };
+    }
+    log((msg.ok ? '✓ ' : '✗ ') + (msg.error || 'ok'));
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
+  };
+
+  $('toggle').onclick = () => {
+    if (ws && ws.readyState === 1) {
+      manualStop = true;
+      clearTimeout(retry);
+      ws.close();
+    } else {
+      connect();
+    }
+  };
+
+  connect();
+</script>

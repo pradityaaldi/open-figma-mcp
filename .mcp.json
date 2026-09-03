@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "open-figma-mcp": {
+      "command": "node",
+      "args": ["mcp/server.js"],
+      "env": {
+        "BRIDGE_PORT": "3055"
+      }
+    }
+  }
+}
