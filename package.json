@@ -1,6 +1,7 @@
 {
   "name": "open-figma-mcp",
   "version": "0.1.0",
+  "private": true,
   "description": "Self-hosted, harness-agnostic Figma MCP server — unlimited tool calls via your own Figma plugin",
   "type": "module",
   "bin": {
@@ -25,7 +26,7 @@
     "type": "git",
     "url": "git+https://github.com/pradityaaldi/open-figma-mcp.git"
   },
-  "homepage": "https://github.com/pradityaaldi/open-figma-mcp#readme",
+  "homepage": "https://pradityaaldi.github.io/open-figma-mcp/",
   "bugs": "https://github.com/pradityaaldi/open-figma-mcp/issues",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",

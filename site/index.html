@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Read and edit the Figma file in front of you from any MCP client. Local, open source, and without API quotas.">
+    <meta name="theme-color" content="#171513">
+    <title>Open Figma MCP — Your canvas, wired to your agent</title>
+    <style>
+      :root {
+        --ink: #171513;
+        --paper: #f5f0e7;
+        --card: #fffaf1;
+        --muted: #6f6960;
+        --line: #d8d0c4;
+        --lime: #c8ff4a;
+        --violet: #7657ff;
+        --coral: #ff6b55;
+        --shadow: 0 18px 55px rgba(34, 27, 17, .12);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 85% 4%, rgba(118, 87, 255, .16), transparent 24rem),
+          radial-gradient(circle at 8% 43%, rgba(200, 255, 74, .2), transparent 22rem),
+          var(--paper);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      a { color: inherit; }
+      .shell { width: min(1120px, calc(100% - 40px)); margin: auto; }
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px 0;
+      }
+      .brand { display: flex; align-items: center; gap: 12px; font-weight: 850; letter-spacing: -.03em; text-decoration: none; }
+      .mark { display: grid; grid-template-columns: repeat(2, 12px); gap: 3px; transform: rotate(-5deg); }
+      .mark i { display: block; width: 12px; height: 12px; border-radius: 4px; background: var(--ink); }
+      .mark i:nth-child(2) { background: var(--violet); border-radius: 50%; }
+      .mark i:nth-child(3) { background: var(--coral); border-radius: 50%; }
+      .mark i:nth-child(4) { background: var(--lime); }
+      .nav-links { display: flex; align-items: center; gap: 26px; font-size: 14px; font-weight: 700; }
+      .nav-links a { text-decoration: none; }
+      .github { border: 1px solid var(--ink); border-radius: 100px; padding: 10px 16px; }
+
+      .hero { padding: 86px 0 96px; text-align: center; }
+      .eyebrow {
+        display: inline-flex; align-items: center; gap: 9px;
+        border: 1px solid var(--line); background: rgba(255,255,255,.45);
+        border-radius: 100px; padding: 8px 13px; color: var(--muted);
+        font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #3fb950; box-shadow: 0 0 0 4px rgba(63,185,80,.13); }
+      h1 { max-width: 900px; margin: 28px auto 22px; font-size: clamp(52px, 8.2vw, 102px); line-height: .94; letter-spacing: -.075em; }
+      h1 span { color: var(--violet); position: relative; white-space: nowrap; }
+      .lead { max-width: 680px; margin: 0 auto; color: var(--muted); font-size: clamp(18px, 2vw, 22px); line-height: 1.55; }
+
+      .command {
+        max-width: 820px; margin: 42px auto 16px; display: flex; align-items: center;
+        gap: 16px; text-align: left; background: var(--ink); color: #fef9ed;
+        border-radius: 16px; padding: 9px 9px 9px 22px; box-shadow: var(--shadow);
+      }
+      .command code { flex: 1; overflow-x: auto; white-space: nowrap; font: 600 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; scrollbar-width: none; }
+      .command code::before { content: "$ "; color: var(--lime); }
+      button {
+        border: 0; border-radius: 11px; padding: 14px 20px; cursor: pointer;
+        background: var(--lime); color: var(--ink); font-weight: 850;
+      }
+      .micro { color: var(--muted); font-size: 13px; }
+
+      section { padding: 78px 0; }
+      .section-label { color: var(--violet); font: 800 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; letter-spacing: .11em; }
+      h2 { max-width: 720px; margin: 15px 0 38px; font-size: clamp(36px, 5vw, 62px); line-height: 1; letter-spacing: -.055em; }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+      .card { background: rgba(255,250,241,.8); border: 1px solid var(--line); border-radius: 18px; padding: 26px; box-shadow: 0 8px 24px rgba(34,27,17,.04); }
+      .number { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--ink); color: var(--lime); font: 800 14px ui-monospace, monospace; }
+      .card h3 { margin: 28px 0 9px; font-size: 21px; letter-spacing: -.025em; }
+      .card p { margin: 0; color: var(--muted); line-height: 1.6; }
+      .card code { color: var(--violet); font-weight: 750; }
+
+      .flow { background: var(--ink); color: var(--paper); border-radius: 28px; padding: clamp(28px, 5vw, 60px); box-shadow: var(--shadow); overflow: hidden; position: relative; }
+      .flow::after { content: ""; position: absolute; width: 230px; height: 230px; border: 55px solid var(--violet); border-radius: 50%; right: -130px; top: -130px; opacity: .8; }
+      .flow h2 { margin-bottom: 54px; }
+      .flow-row { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 18px; position: relative; z-index: 1; }
+      .node { min-height: 130px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #45413c; border-radius: 16px; padding: 20px; background: #211f1c; }
+      .node small { color: #9c968c; font: 700 11px ui-monospace, monospace; text-transform: uppercase; }
+      .node strong { font-size: 20px; }
+      .arrow { color: var(--lime); font-size: 25px; }
+
+      .tools { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .tool { display: flex; gap: 18px; padding: 20px; border-bottom: 1px solid var(--line); }
+      .tool code { min-width: 190px; font-weight: 800; color: var(--violet); }
+      .tool span { color: var(--muted); }
+
+      .cta { text-align: center; padding-bottom: 110px; }
+      .cta-box { padding: clamp(35px, 7vw, 75px); border-radius: 28px; background: var(--violet); color: white; }
+      .cta-box h2 { margin: 0 auto 18px; }
+      .cta-box p { opacity: .78; font-size: 18px; }
+      .cta-box .command { margin-bottom: 0; }
+      footer { display: flex; justify-content: space-between; gap: 20px; padding: 25px 0 38px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+
+      @media (max-width: 760px) {
+        .nav-links a:not(.github) { display: none; }
+        .hero { padding: 58px 0 70px; }
+        h1 { font-size: clamp(49px, 15vw, 72px); }
+        .grid, .tools { grid-template-columns: 1fr; }
+        .flow-row { grid-template-columns: 1fr; }
+        .arrow { transform: rotate(90deg); text-align: center; }
+        .tool { display: block; }
+        .tool code { display: block; margin-bottom: 8px; }
+        .command { padding-left: 16px; gap: 8px; }
+        .command button { padding: 12px; }
+        footer { flex-direction: column; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <nav>
+        <a class="brand" href="#top" aria-label="Open Figma MCP home">
+          <span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          Open Figma MCP
+        </a>
+        <div class="nav-links">
+          <a href="#install">Install</a>
+          <a href="#tools">Tools</a>
+          <a class="github" href="https://github.com/pradityaaldi/open-figma-mcp">GitHub ↗</a>
+        </div>
+      </nav>
+
+      <main id="top">
+        <header class="hero">
+          <div class="eyebrow">LOCAL BRIDGE · NO API QUOTA</div>
+          <h1>Your canvas,<br><span>wired to your agent.</span></h1>
+          <p class="lead">Read and edit the Figma file in front of you from Claude, Cursor, Codex, or any MCP client. Open source and running entirely on your machine.</p>
+          <div class="command" data-copy>
+            <code>curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash</code>
+            <button type="button">Copy</button>
+          </div>
+          <p class="micro">macOS &amp; Linux · Node.js 20+ · no sudo</p>
+        </header>
+
+        <section id="install">
+          <div class="section-label">Setup</div>
+          <h2>One command. Three small steps.</h2>
+          <div class="grid">
+            <article class="card">
+              <div class="number">01</div>
+              <h3>Run the installer</h3>
+              <p>It downloads the latest release, installs dependencies, and registers the local development plugin.</p>
+            </article>
+            <article class="card">
+              <div class="number">02</div>
+              <h3>Open the plugin</h3>
+              <p>In a Figma file, choose <code>Plugins → Development → Open Figma MCP</code> and leave its small window open.</p>
+            </article>
+            <article class="card">
+              <div class="number">03</div>
+              <h3>Connect your client</h3>
+              <p>Copy the MCP configuration printed by the installer. The status dot turns green when your agent connects.</p>
+            </article>
+          </div>
+        </section>
+
+        <section>
+          <div class="flow">
+            <div class="section-label">How it works</div>
+            <h2>A short, local path from prompt to pixels.</h2>
+            <div class="flow-row">
+              <div class="node"><small>MCP client</small><strong>Claude · Cursor · Codex</strong></div>
+              <div class="arrow">→</div>
+              <div class="node"><small>Local bridge</small><strong>stdio + WebSocket</strong></div>
+              <div class="arrow">→</div>
+              <div class="node"><small>Figma desktop</small><strong>Your open file</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tools">
+          <div class="section-label">Capabilities</div>
+          <h2>Enough access to actually do the work.</h2>
+          <div class="tools">
+            <div class="tool"><code>figma_exec</code><span>Run Plugin API JavaScript against the open document.</span></div>
+            <div class="tool"><code>figma_screenshot</code><span>Export any node as an inline PNG.</span></div>
+            <div class="tool"><code>figma_get_metadata</code><span>Inspect the structure, names, types, and sizes.</span></div>
+            <div class="tool"><code>figma_get_selection</code><span>Read what is selected right now.</span></div>
+            <div class="tool"><code>figma_get_pages</code><span>List document pages and their identifiers.</span></div>
+            <div class="tool"><code>figma_set_page</code><span>Switch the page your agent works on.</span></div>
+            <div class="tool"><code>figma_status</code><span>Check the bridge, open file, and current page.</span></div>
+            <div class="tool"><code>figma_toggle_ui</code><span>Show or hide the plugin window when needed.</span></div>
+          </div>
+        </section>
+
+        <section class="cta">
+          <div class="cta-box">
+            <h2>Make the first connection.</h2>
+            <p>Run the same command later whenever you want to update.</p>
+            <div class="command" data-copy>
+              <code>curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash</code>
+              <button type="button">Copy</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>Open Figma MCP · MIT licensed</span>
+        <span>Built for local-first design automation.</span>
+      </footer>
+    </div>
+
+    <script>
+      document.querySelectorAll('[data-copy]').forEach((block) => {
+        const button = block.querySelector('button');
+        const command = block.querySelector('code').textContent;
+        button.addEventListener('click', async () => {
+          await navigator.clipboard.writeText(command);
+          button.textContent = 'Copied!';
+          window.setTimeout(() => { button.textContent = 'Copy'; }, 1600);
+        });
+      });
+    </script>
+  </body>
+</html>

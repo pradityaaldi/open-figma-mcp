@@ -20,18 +20,33 @@ the UI holds the socket, the main thread does the work, `postMessage` joins them
 ## Quick start
 
 ```bash
-# 1. Register the plugin in Figma desktop (quits and relaunches Figma once)
-npx -y open-figma-mcp install-plugin
-
-# 2. Register the MCP server with your client
-claude mcp add open-figma-mcp --scope user -- npx -y open-figma-mcp
+# Install the server and register the plugin in Figma desktop
+curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash
 ```
 
-Then open a Figma file, run **Plugins → Development → Open Figma MCP**, and call
-`figma_status` from your MCP client. The dot in the plugin window turns green
-when the bridge is connected.
+The installer prints the exact MCP configuration for your machine. Add it to
+your client, then open a Figma file and run
+**Plugins → Development → Open Figma MCP**. Call `figma_status` from your MCP
+client; the dot in the plugin window turns green when the bridge is connected.
 
 Leave the plugin window open — closing it drops the socket. Reopening reconnects.
+
+Running the install command again updates to the latest GitHub release. To
+remove both the installed command and the development plugin:
+
+```bash
+curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash -s -- --uninstall
+```
+
+Install a specific tag with `--ref v0.1.0`, or add `--no-plugin` when you only
+want to install/update the MCP server runtime.
+
+Maintainers can publish an update by pushing a `v*` tag. The release workflow
+runs the test suite and creates the GitHub Release consumed by the installer.
+
+Requirements: macOS or Linux, Node.js 20 or newer, `curl`, and `npm`. The
+installer writes only to user-owned directories (`~/.local` and
+`~/.open-figma-mcp`) and does not need `sudo`.
 
 ### What `install-plugin` does
 
@@ -43,7 +58,7 @@ to it, and relaunches Figma. The plugin then shows up under
 **Plugins → Development** without the manual import step.
 
 Flags: `--no-quit` (you close Figma yourself), `--no-relaunch`.
-`npx open-figma-mcp uninstall-plugin` reverses it.
+`open-figma-mcp uninstall-plugin` reverses it.
 
 If the settings file cannot be found or Figma will not quit, the command falls
 back to printing the manifest path so you can use
@@ -58,12 +73,14 @@ Any client that speaks stdio MCP works. Cursor / Windsurf / Claude Desktop:
 {
   "mcpServers": {
     "open-figma-mcp": {
-      "command": "npx",
-      "args": ["-y", "open-figma-mcp"]
+      "command": "/Users/YOU/.local/bin/open-figma-mcp"
     }
   }
 }
 ```
+
+Use the absolute command path printed by the installer. Absolute paths are more
+reliable for desktop MCP clients, which may not inherit your terminal's `PATH`.
 
 ### From a clone
 
