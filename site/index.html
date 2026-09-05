@@ -1,228 +1,179 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Read and edit the Figma file in front of you from any MCP client. Local, open source, and without API quotas.">
+    <meta name="description" content="Panduan langkah demi langkah untuk menghubungkan Figma Desktop ke Claude, Cursor, dan aplikasi AI yang mendukung MCP.">
     <meta name="theme-color" content="#171513">
-    <title>Open Figma MCP — Your canvas, wired to your agent</title>
+    <title>Open Figma MCP — Panduan mudah untuk desainer</title>
     <style>
-      :root {
-        --ink: #171513;
-        --paper: #f5f0e7;
-        --card: #fffaf1;
-        --muted: #6f6960;
-        --line: #d8d0c4;
-        --lime: #c8ff4a;
-        --violet: #7657ff;
-        --coral: #ff6b55;
-        --shadow: 0 18px 55px rgba(34, 27, 17, .12);
-      }
-
-      * { box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
-      body {
-        margin: 0;
-        color: var(--ink);
-        background:
-          radial-gradient(circle at 85% 4%, rgba(118, 87, 255, .16), transparent 24rem),
-          radial-gradient(circle at 8% 43%, rgba(200, 255, 74, .2), transparent 22rem),
-          var(--paper);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-
-      a { color: inherit; }
-      .shell { width: min(1120px, calc(100% - 40px)); margin: auto; }
-      nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 24px 0;
-      }
-      .brand { display: flex; align-items: center; gap: 12px; font-weight: 850; letter-spacing: -.03em; text-decoration: none; }
-      .mark { display: grid; grid-template-columns: repeat(2, 12px); gap: 3px; transform: rotate(-5deg); }
-      .mark i { display: block; width: 12px; height: 12px; border-radius: 4px; background: var(--ink); }
-      .mark i:nth-child(2) { background: var(--violet); border-radius: 50%; }
-      .mark i:nth-child(3) { background: var(--coral); border-radius: 50%; }
-      .mark i:nth-child(4) { background: var(--lime); }
-      .nav-links { display: flex; align-items: center; gap: 26px; font-size: 14px; font-weight: 700; }
-      .nav-links a { text-decoration: none; }
-      .github { border: 1px solid var(--ink); border-radius: 100px; padding: 10px 16px; }
-
-      .hero { padding: 86px 0 96px; text-align: center; }
-      .eyebrow {
-        display: inline-flex; align-items: center; gap: 9px;
-        border: 1px solid var(--line); background: rgba(255,255,255,.45);
-        border-radius: 100px; padding: 8px 13px; color: var(--muted);
-        font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
-      }
-      .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #3fb950; box-shadow: 0 0 0 4px rgba(63,185,80,.13); }
-      h1 { max-width: 900px; margin: 28px auto 22px; font-size: clamp(52px, 8.2vw, 102px); line-height: .94; letter-spacing: -.075em; }
-      h1 span { color: var(--violet); position: relative; white-space: nowrap; }
-      .lead { max-width: 680px; margin: 0 auto; color: var(--muted); font-size: clamp(18px, 2vw, 22px); line-height: 1.55; }
-
-      .command {
-        max-width: 820px; margin: 42px auto 16px; display: flex; align-items: center;
-        gap: 16px; text-align: left; background: var(--ink); color: #fef9ed;
-        border-radius: 16px; padding: 9px 9px 9px 22px; box-shadow: var(--shadow);
-      }
-      .command code { flex: 1; overflow-x: auto; white-space: nowrap; font: 600 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; scrollbar-width: none; }
-      .command code::before { content: "$ "; color: var(--lime); }
-      button {
-        border: 0; border-radius: 11px; padding: 14px 20px; cursor: pointer;
-        background: var(--lime); color: var(--ink); font-weight: 850;
-      }
-      .micro { color: var(--muted); font-size: 13px; }
-
-      section { padding: 78px 0; }
-      .section-label { color: var(--violet); font: 800 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; letter-spacing: .11em; }
-      h2 { max-width: 720px; margin: 15px 0 38px; font-size: clamp(36px, 5vw, 62px); line-height: 1; letter-spacing: -.055em; }
-      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-      .card { background: rgba(255,250,241,.8); border: 1px solid var(--line); border-radius: 18px; padding: 26px; box-shadow: 0 8px 24px rgba(34,27,17,.04); }
-      .number { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--ink); color: var(--lime); font: 800 14px ui-monospace, monospace; }
-      .card h3 { margin: 28px 0 9px; font-size: 21px; letter-spacing: -.025em; }
-      .card p { margin: 0; color: var(--muted); line-height: 1.6; }
-      .card code { color: var(--violet); font-weight: 750; }
-
-      .flow { background: var(--ink); color: var(--paper); border-radius: 28px; padding: clamp(28px, 5vw, 60px); box-shadow: var(--shadow); overflow: hidden; position: relative; }
-      .flow::after { content: ""; position: absolute; width: 230px; height: 230px; border: 55px solid var(--violet); border-radius: 50%; right: -130px; top: -130px; opacity: .8; }
-      .flow h2 { margin-bottom: 54px; }
-      .flow-row { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 18px; position: relative; z-index: 1; }
-      .node { min-height: 130px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #45413c; border-radius: 16px; padding: 20px; background: #211f1c; }
-      .node small { color: #9c968c; font: 700 11px ui-monospace, monospace; text-transform: uppercase; }
-      .node strong { font-size: 20px; }
-      .arrow { color: var(--lime); font-size: 25px; }
-
-      .tools { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-      .tool { display: flex; gap: 18px; padding: 20px; border-bottom: 1px solid var(--line); }
-      .tool code { min-width: 190px; font-weight: 800; color: var(--violet); }
-      .tool span { color: var(--muted); }
-
-      .cta { text-align: center; padding-bottom: 110px; }
-      .cta-box { padding: clamp(35px, 7vw, 75px); border-radius: 28px; background: var(--violet); color: white; }
-      .cta-box h2 { margin: 0 auto 18px; }
-      .cta-box p { opacity: .78; font-size: 18px; }
-      .cta-box .command { margin-bottom: 0; }
-      footer { display: flex; justify-content: space-between; gap: 20px; padding: 25px 0 38px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
-
-      @media (max-width: 760px) {
-        .nav-links a:not(.github) { display: none; }
-        .hero { padding: 58px 0 70px; }
-        h1 { font-size: clamp(49px, 15vw, 72px); }
-        .grid, .tools { grid-template-columns: 1fr; }
-        .flow-row { grid-template-columns: 1fr; }
-        .arrow { transform: rotate(90deg); text-align: center; }
-        .tool { display: block; }
-        .tool code { display: block; margin-bottom: 8px; }
-        .command { padding-left: 16px; gap: 8px; }
-        .command button { padding: 12px; }
-        footer { flex-direction: column; }
-      }
+      :root { --ink:#171513; --paper:#f5f0e7; --card:#fffaf1; --muted:#6f6960; --line:#d8d0c4; --lime:#c8ff4a; --violet:#7657ff; --coral:#ff6b55; --green:#1d8b4c; --shadow:0 18px 55px rgba(34,27,17,.12); }
+      * { box-sizing:border-box; }
+      html { scroll-behavior:smooth; }
+      body { margin:0; overflow-x:hidden; color:var(--ink); background:radial-gradient(circle at 85% 4%,rgba(118,87,255,.16),transparent 24rem),radial-gradient(circle at 8% 43%,rgba(200,255,74,.2),transparent 22rem),var(--paper); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+      a { color:inherit; } code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+      .shell { width:min(1120px,calc(100% - 40px)); margin:auto; }
+      nav { display:flex; align-items:center; justify-content:space-between; padding:24px 0; }
+      .brand { display:flex; align-items:center; gap:12px; font-weight:850; letter-spacing:-.03em; text-decoration:none; }
+      .mark { display:grid; grid-template-columns:repeat(2,12px); gap:3px; transform:rotate(-5deg); }
+      .mark i { display:block; width:12px; height:12px; border-radius:4px; background:var(--ink); }
+      .mark i:nth-child(2) { background:var(--violet); border-radius:50%; } .mark i:nth-child(3) { background:var(--coral); border-radius:50%; } .mark i:nth-child(4) { background:var(--lime); }
+      .nav-links { display:flex; align-items:center; gap:25px; font-size:14px; font-weight:750; } .nav-links a { text-decoration:none; }
+      .github { border:1px solid var(--ink); border-radius:100px; padding:10px 16px; }
+      .hero { padding:76px 0 86px; text-align:center; }
+      .eyebrow { display:inline-flex; align-items:center; gap:9px; border:1px solid var(--line); background:rgba(255,255,255,.48); border-radius:100px; padding:8px 13px; color:var(--muted); font:750 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace; }
+      .eyebrow::before { content:""; width:8px; height:8px; border-radius:50%; background:#3fb950; box-shadow:0 0 0 4px rgba(63,185,80,.13); }
+      h1 { max-width:920px; margin:28px auto 22px; font-size:clamp(48px,8vw,96px); line-height:.96; letter-spacing:-.072em; } h1 span { color:var(--violet); }
+      .lead { max-width:720px; margin:0 auto; color:var(--muted); font-size:clamp(18px,2vw,22px); line-height:1.55; }
+      .hero-actions { margin-top:34px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+      .button { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:12px; padding:14px 20px; background:var(--ink); color:white; text-decoration:none; font-weight:850; }
+      .button.secondary { color:var(--ink); background:transparent; border:1px solid var(--line); } .micro { margin-top:18px; color:var(--muted); font-size:13px; }
+      section { padding:76px 0; }
+      .section-label { color:var(--violet); font:850 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace; text-transform:uppercase; letter-spacing:.11em; }
+      h2 { max-width:790px; margin:15px 0 22px; font-size:clamp(36px,5vw,62px); line-height:1; letter-spacing:-.055em; }
+      .section-intro { max-width:720px; margin:0 0 40px; color:var(--muted); font-size:18px; line-height:1.65; }
+      .plain-note { display:flex; align-items:flex-start; gap:14px; padding:18px 20px; border:1px solid #c9bdfd; background:#eeebff; border-radius:14px; line-height:1.55; }
+      .plain-note strong { display:block; margin-bottom:3px; } .plain-note .icon { font-size:20px; }
+      .requirements { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:28px; }
+      .requirement { padding:22px; border:1px solid var(--line); border-radius:16px; background:rgba(255,250,241,.8); }
+      .requirement .check { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--lime); font-weight:900; }
+      .requirement h3 { margin:19px 0 7px; font-size:17px; } .requirement p { margin:0; color:var(--muted); font-size:14px; line-height:1.55; }
+      .tutorial { display:grid; gap:24px; margin-top:44px; }
+      .step { display:grid; grid-template-columns:70px minmax(0,1fr); border:1px solid var(--line); border-radius:22px; overflow:hidden; background:rgba(255,250,241,.9); box-shadow:0 9px 28px rgba(34,27,17,.05); }
+      .step-number { padding-top:31px; text-align:center; color:var(--violet); font:900 18px ui-monospace,monospace; border-right:1px solid var(--line); background:rgba(118,87,255,.055); }
+      .step-body { display:grid; grid-template-columns:minmax(0,1.02fr) minmax(320px,.98fr); gap:38px; padding:32px; align-items:center; }
+      .step h3 { margin:0 0 12px; font-size:27px; letter-spacing:-.035em; } .step p { margin:0 0 15px; color:var(--muted); line-height:1.65; }
+      .step ol,.step ul { margin:14px 0 0; padding-left:21px; color:var(--muted); line-height:1.75; } .step li+li { margin-top:6px; } .step strong { color:var(--ink); }
+      .inline-link { color:var(--violet); font-weight:800; }
+      .window { overflow:hidden; border:1px solid #34302c; border-radius:15px; background:#181715; color:#f8f2e8; box-shadow:var(--shadow); }
+      .window-bar { display:flex; align-items:center; gap:7px; padding:11px 13px; border-bottom:1px solid #34302c; background:#24211f; color:#a9a29a; font-size:11px; }
+      .dot { width:10px; height:10px; border-radius:50%; background:#ff605c; } .dot:nth-child(2) { background:#ffbd44; } .dot:nth-child(3) { background:#00ca4e; margin-right:7px; }
+      .window-content { padding:19px; min-height:150px; font:600 13px/1.75 ui-monospace,SFMono-Regular,Menlo,monospace; overflow-x:auto; }
+      .prompt { color:var(--lime); } .dim { color:#8e8880; } .success { color:#70e59a; } .terminal-command { color:white; }
+      .key { display:inline-block; min-width:28px; padding:3px 7px; border:1px solid var(--line); border-bottom-width:3px; border-radius:6px; background:white; color:var(--ink); font-size:12px; font-weight:800; text-align:center; }
+      .command { display:flex; align-items:center; gap:14px; text-align:left; background:var(--ink); color:#fef9ed; border-radius:14px; padding:9px 9px 9px 18px; box-shadow:var(--shadow); }
+      .command code { flex:1; min-width:0; overflow-x:auto; white-space:nowrap; font:600 13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; scrollbar-width:none; } .command code::before { content:"$ "; color:var(--lime); }
+      button { border:0; border-radius:10px; padding:12px 17px; cursor:pointer; background:var(--lime); color:var(--ink); font-weight:850; }
+      .command-caption { margin-top:10px!important; font-size:13px; }
+      .expected { margin-top:15px; padding:13px 15px; border-left:4px solid var(--green); border-radius:0 9px 9px 0; background:#e8f6ec; color:#24663d; font-size:14px; line-height:1.55; }
+      .warning { border-left-color:#e79a21; background:#fff2d7; color:#76500e; }
+      .config { margin-top:16px; padding:18px; overflow-x:auto; border-radius:13px; background:#1b1917; color:#f9f3e8; font:600 12px/1.65 ui-monospace,monospace; }
+      .config .accent { color:var(--lime); }
+      .client-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:18px; } .client { border:1px solid var(--line); border-radius:13px; padding:16px; }
+      .client strong { display:block; margin-bottom:6px; } .client span { color:var(--muted); font-size:13px; line-height:1.5; }
+      .flow { background:var(--ink); color:var(--paper); border-radius:28px; padding:clamp(28px,5vw,60px); box-shadow:var(--shadow); overflow:hidden; position:relative; }
+      .flow::after { content:""; position:absolute; width:230px; height:230px; border:55px solid var(--violet); border-radius:50%; right:-130px; top:-130px; opacity:.8; }
+      .flow h2 { margin-bottom:50px; } .flow-row { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:center; gap:18px; position:relative; z-index:1; }
+      .node { min-height:125px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid #45413c; border-radius:16px; padding:20px; background:#211f1c; }
+      .node small { color:#9c968c; font:700 11px ui-monospace,monospace; text-transform:uppercase; } .node strong { font-size:19px; } .arrow { color:var(--lime); font-size:25px; }
+      .faq { display:grid; gap:11px; margin-top:34px; } details { border:1px solid var(--line); border-radius:14px; background:rgba(255,250,241,.86); }
+      summary { padding:19px 21px; cursor:pointer; font-weight:850; list-style:none; } summary::-webkit-details-marker { display:none; } summary::after { content:"+"; float:right; color:var(--violet); font-size:21px; line-height:.8; } details[open] summary::after { content:"−"; }
+      details p,details ol { margin:0 21px 20px; color:var(--muted); line-height:1.65; } details code { color:var(--violet); font-weight:750; }
+      .cta { text-align:center; padding-bottom:105px; } .cta-box { padding:clamp(34px,7vw,72px); border-radius:28px; background:var(--violet); color:white; }
+      .cta-box h2 { margin:0 auto 15px; } .cta-box p { max-width:610px; margin:0 auto 27px; opacity:.8; font-size:17px; line-height:1.6; } .cta-box .command { max-width:820px; margin:auto; }
+      footer { display:flex; justify-content:space-between; gap:20px; padding:25px 0 38px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; }
+      @media(max-width:900px) { .requirements { grid-template-columns:1fr 1fr; } .step-body { grid-template-columns:1fr; } .client-grid { grid-template-columns:1fr; } }
+      @media(max-width:680px) { .nav-links a:not(.github) { display:none; } .shell { width:min(100% - 28px,1120px); min-width:0; } .brand { font-size:14px; } .github { padding:8px 10px; font-size:12px; } .hero { padding:52px 0 64px; } .eyebrow { max-width:100%; padding-inline:10px; font-size:10px; white-space:normal; } h1 { font-size:clamp(42px,13vw,56px); overflow-wrap:anywhere; } section { padding:58px 0; } .requirements { grid-template-columns:1fr; } .step { grid-template-columns:46px minmax(0,1fr); } .step-number { padding-top:27px; font-size:14px; } .step-body { min-width:0; padding:25px 20px; gap:25px; } .step-body>*,.window,.command,.plain-note>div { min-width:0; } .step h3 { font-size:23px; } .flow-row { grid-template-columns:1fr; } .arrow { transform:rotate(90deg); text-align:center; } .command { max-width:100%; padding-left:14px; gap:7px; } .command button { padding:11px; } footer { flex-direction:column; } }
     </style>
   </head>
   <body>
     <div class="shell">
       <nav>
-        <a class="brand" href="#top" aria-label="Open Figma MCP home">
-          <span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-          Open Figma MCP
-        </a>
-        <div class="nav-links">
-          <a href="#install">Install</a>
-          <a href="#tools">Tools</a>
-          <a class="github" href="https://github.com/pradityaaldi/open-figma-mcp">GitHub ↗</a>
-        </div>
+        <a class="brand" href="#top" aria-label="Beranda Open Figma MCP"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Open Figma MCP</a>
+        <div class="nav-links"><a href="#persiapan">Persiapan</a><a href="#tutorial">Tutorial</a><a href="#bantuan">Bantuan</a><a class="github" href="https://github.com/pradityaaldi/open-figma-mcp">GitHub ↗</a></div>
       </nav>
 
       <main id="top">
         <header class="hero">
-          <div class="eyebrow">LOCAL BRIDGE · NO API QUOTA</div>
-          <h1>Your canvas,<br><span>wired to your agent.</span></h1>
-          <p class="lead">Read and edit the Figma file in front of you from Claude, Cursor, Codex, or any MCP client. Open source and running entirely on your machine.</p>
-          <div class="command" data-copy>
-            <code>curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash</code>
-            <button type="button">Copy</button>
-          </div>
-          <p class="micro">macOS &amp; Linux · Node.js 20+ · no sudo</p>
+          <div class="eyebrow">GRATIS · BERJALAN DI KOMPUTER SENDIRI</div>
+          <h1>Hubungkan Figma<br><span>dengan asisten AI.</span></h1>
+          <p class="lead">Minta AI membaca layer, mengambil screenshot, atau membantu mengedit file Figma yang sedang dibuka. Panduan ini dibuat untuk desainer—tidak perlu bisa coding.</p>
+          <div class="hero-actions"><a class="button" href="#tutorial">Mulai panduan ↓</a><a class="button secondary" href="#cara-kerja">Apa itu MCP?</a></div>
+          <p class="micro">Waktu pemasangan sekitar 5–10 menit · Untuk Figma Desktop di macOS dan Linux</p>
         </header>
 
-        <section id="install">
-          <div class="section-label">Setup</div>
-          <h2>One command. Three small steps.</h2>
-          <div class="grid">
-            <article class="card">
-              <div class="number">01</div>
-              <h3>Run the installer</h3>
-              <p>It downloads the latest release, installs dependencies, and registers the local development plugin.</p>
-            </article>
-            <article class="card">
-              <div class="number">02</div>
-              <h3>Open the plugin</h3>
-              <p>In a Figma file, choose <code>Plugins → Development → Open Figma MCP</code> and leave its small window open.</p>
-            </article>
-            <article class="card">
-              <div class="number">03</div>
-              <h3>Connect your client</h3>
-              <p>Copy the MCP configuration printed by the installer. The status dot turns green when your agent connects.</p>
-            </article>
+        <section id="persiapan">
+          <div class="section-label">Sebelum mulai</div><h2>Siapkan empat hal ini.</h2>
+          <p class="section-intro">Semua proses dilakukan di komputer Anda. Anda tidak membutuhkan Figma API key dan tidak perlu membayar layanan tambahan.</p>
+          <div class="plain-note"><span class="icon">💡</span><div><strong>Istilah sederhana</strong>MCP adalah “kabel penghubung” yang membuat aplikasi AI bisa memakai alat lain. Dalam panduan ini, MCP menghubungkan aplikasi AI dengan file Figma yang sedang Anda buka.</div></div>
+          <div class="requirements">
+            <article class="requirement"><span class="check">✓</span><h3>Mac atau Linux</h3><p>Installer otomatis saat ini belum mendukung Windows.</p></article>
+            <article class="requirement"><span class="check">✓</span><h3>Figma Desktop</h3><p>Gunakan aplikasi desktop, bukan Figma di browser.</p></article>
+            <article class="requirement"><span class="check">✓</span><h3>Aplikasi AI + MCP</h3><p>Contohnya Claude, Cursor, atau aplikasi lain yang menerima MCP lokal.</p></article>
+            <article class="requirement"><span class="check">✓</span><h3>Node.js 20+</h3><p>Program pendukung gratis. Cara mengeceknya ada di langkah 3.</p></article>
           </div>
         </section>
 
-        <section>
-          <div class="flow">
-            <div class="section-label">How it works</div>
-            <h2>A short, local path from prompt to pixels.</h2>
-            <div class="flow-row">
-              <div class="node"><small>MCP client</small><strong>Claude · Cursor · Codex</strong></div>
-              <div class="arrow">→</div>
-              <div class="node"><small>Local bridge</small><strong>stdio + WebSocket</strong></div>
-              <div class="arrow">→</div>
-              <div class="node"><small>Figma desktop</small><strong>Your open file</strong></div>
-            </div>
+        <section id="tutorial">
+          <div class="section-label">Tutorial lengkap</div><h2>Ikuti satu per satu. Tidak perlu terburu-buru.</h2>
+          <p class="section-intro">Jangan khawatir melihat Terminal. Di panduan ini Anda hanya perlu menyalin beberapa perintah, menempelkannya, lalu menekan Enter.</p>
+          <div class="tutorial">
+            <article class="step"><div class="step-number">01</div><div class="step-body">
+              <div><h3>Pastikan memakai Figma Desktop</h3><p>Buka aplikasi Figma dari folder Applications. Setelah masuk, buka salah satu file desain yang aman untuk dicoba.</p><div class="expected"><strong>Yang benar:</strong> Figma terbuka sebagai aplikasi tersendiri dan memiliki menu <strong>Plugins</strong>. Jika desain terbuka di tab Brave, Chrome, atau Safari, pindahkan ke Figma Desktop.</div></div>
+              <div class="window" aria-label="Ilustrasi menu Figma Desktop"><div class="window-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i> Figma Desktop</div><div class="window-content"><span class="dim">File&nbsp;&nbsp; Edit&nbsp;&nbsp; View&nbsp;&nbsp; Object&nbsp;&nbsp;</span><strong>Plugins</strong><br><br><span class="success">✓ File desain sudah terbuka</span></div></div>
+            </div></article>
+
+            <article class="step"><div class="step-number">02</div><div class="step-body">
+              <div><h3>Buka aplikasi Terminal</h3><p>Terminal adalah tempat kita memberikan perintah singkat kepada komputer.</p><ol><li>Tekan <span class="key">⌘</span> + <span class="key">Space</span>.</li><li>Ketik <strong>Terminal</strong>.</li><li>Tekan <span class="key">Enter</span>.</li></ol><div class="expected">Jendela gelap atau terang berisi teks akan muncul. Itu normal dan aman—biarkan tetap terbuka.</div></div>
+              <div class="window" aria-label="Ilustrasi pencarian Terminal di macOS"><div class="window-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i> Spotlight Search</div><div class="window-content"><span class="dim">⌕</span>&nbsp; Terminal<br><br><span class="dim">Top Hit</span><br>▣ &nbsp;<strong>Terminal.app</strong></div></div>
+            </div></article>
+
+            <article class="step"><div class="step-number">03</div><div class="step-body">
+              <div><h3>Periksa Node.js</h3><p>Salin perintah pendek di bawah. Tempel ke Terminal dengan <span class="key">⌘</span> + <span class="key">V</span>, lalu tekan <span class="key">Enter</span>.</p><div class="command" data-copy><code>node --version</code><button type="button">Salin</button></div><div class="expected"><strong>Jika muncul v20, v22, v24, atau lebih besar:</strong> lanjut ke langkah 4.</div><div class="expected warning"><strong>Jika muncul “command not found”:</strong> unduh <a class="inline-link" href="https://nodejs.org/en/download">Node.js LTS dari situs resminya</a>, buka file installer, klik Continue sampai selesai, lalu tutup dan buka kembali Terminal.</div></div>
+              <div class="window" aria-label="Contoh hasil pemeriksaan Node.js"><div class="window-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i> Terminal</div><div class="window-content"><span class="prompt">~ %</span> <span class="terminal-command">node --version</span><br><span class="success">v22.22.1</span><br><span class="prompt">~ %</span> <span class="dim">▌</span></div></div>
+            </div></article>
+
+            <article class="step"><div class="step-number">04</div><div class="step-body">
+              <div><h3>Pasang Open Figma MCP</h3><p>Klik <strong>Salin</strong>, tempel ke Terminal, kemudian tekan <span class="key">Enter</span>. Tunggu sampai proses selesai; biasanya 1–3 menit.</p><div class="command" data-copy><code>curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash</code><button type="button">Salin</button></div><p class="command-caption">Command ini mengunduh project dari GitHub dan memasangnya hanya untuk akun komputer Anda. Tidak memakai <code>sudo</code>.</p><div class="expected warning"><strong>Figma mungkin tertutup lalu terbuka kembali satu kali.</strong> Ini diperlukan agar plugin bisa didaftarkan. Simpan pekerjaan sebelum menjalankan installer.</div></div>
+              <div class="window" aria-label="Contoh proses instalasi berhasil"><div class="window-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i> Terminal</div><div class="window-content"><span class="dim">Downloading Open Figma MCP…</span><br><span class="dim">Installing runtime dependencies…</span><br><span class="dim">Installing the Figma development plugin…</span><br><span class="success">Open Figma MCP is installed.</span></div></div>
+            </div></article>
+
+            <article class="step"><div class="step-number">05</div><div class="step-body">
+              <div><h3>Simpan konfigurasi yang muncul</h3><p>Di akhir pemasangan, Terminal menampilkan kotak teks bernama <strong>MCP client configuration</strong>. Jangan mengetik ulang. Salin seluruh bagian dari kurung kurawal pembuka sampai penutup.</p><div class="config">{<br>&nbsp; "mcpServers": {<br>&nbsp;&nbsp;&nbsp; <span class="accent">"open-figma-mcp"</span>: {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "command": <span class="accent">"/Users/nama-anda/.local/bin/open-figma-mcp"</span><br>&nbsp;&nbsp;&nbsp; }<br>&nbsp; }<br>}</div><div class="expected"><strong>Penting:</strong> path setiap komputer berbeda. Gunakan konfigurasi yang benar-benar muncul di Terminal Anda, bukan contoh di atas.</div></div>
+              <div><h3>Masukkan ke aplikasi AI</h3><p>Cari menu pengaturan MCP pada aplikasi AI Anda. Nama menunya dapat sedikit berbeda antarversi.</p><div class="client-grid"><div class="client"><strong>Cursor</strong><span>Settings → Tools &amp; Integrations → MCP Tools → tambahkan server custom.</span></div><div class="client"><strong>Claude Desktop</strong><span>Settings → Extensions atau Developer → tambahkan MCP lokal. Restart aplikasi setelah menyimpan.</span></div><div class="client"><strong>Aplikasi lain</strong><span>Cari “MCP Servers”, “Tools”, atau “Integrations”, lalu gunakan konfigurasi JSON tadi.</span></div></div></div>
+            </div></article>
+
+            <article class="step"><div class="step-number">06</div><div class="step-body">
+              <div><h3>Jalankan plugin di file Figma</h3><ol><li>Kembali ke Figma Desktop dan buka file desain.</li><li>Pilih menu <strong>Plugins → Development → Open Figma MCP</strong>.</li><li>Biarkan jendela plugin kecil tetap terbuka selama memakai AI.</li></ol><div class="expected"><strong>Berhasil:</strong> titik di jendela plugin berubah menjadi hijau setelah aplikasi AI tersambung.</div></div>
+              <div class="window" aria-label="Ilustrasi menu plugin Figma"><div class="window-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i> Figma Desktop</div><div class="window-content"><strong>Plugins</strong><br>└─ Development<br>&nbsp;&nbsp;&nbsp;└─ <span class="success">Open Figma MCP</span><br><br><span class="success">● Connected</span></div></div>
+            </div></article>
+
+            <article class="step"><div class="step-number">07</div><div class="step-body">
+              <div><h3>Coba permintaan pertama</h3><p>Kembali ke aplikasi AI dan kirim salah satu contoh berikut:</p><ul><li>“Periksa apakah Open Figma MCP sudah terhubung.”</li><li>“Sebutkan nama halaman Figma yang sedang saya buka.”</li><li>“Jelaskan layer yang sedang saya pilih di Figma.”</li><li>“Ambil screenshot dari frame yang sedang dipilih.”</li></ul><div class="expected"><strong>Tips aman:</strong> mulai dengan membaca status atau layer. Gunakan salinan file ketika pertama kali mencoba perintah yang mengubah desain.</div></div>
+              <div class="window" aria-label="Contoh percakapan dengan AI"><div class="window-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i> AI Assistant</div><div class="window-content">Periksa apakah Open Figma MCP sudah terhubung.<br><br><span class="success">✓ Terhubung ke “Homepage Exploration”</span><br><span class="dim">Halaman aktif: Landing Page</span></div></div>
+            </div></article>
           </div>
         </section>
 
-        <section id="tools">
-          <div class="section-label">Capabilities</div>
-          <h2>Enough access to actually do the work.</h2>
-          <div class="tools">
-            <div class="tool"><code>figma_exec</code><span>Run Plugin API JavaScript against the open document.</span></div>
-            <div class="tool"><code>figma_screenshot</code><span>Export any node as an inline PNG.</span></div>
-            <div class="tool"><code>figma_get_metadata</code><span>Inspect the structure, names, types, and sizes.</span></div>
-            <div class="tool"><code>figma_get_selection</code><span>Read what is selected right now.</span></div>
-            <div class="tool"><code>figma_get_pages</code><span>List document pages and their identifiers.</span></div>
-            <div class="tool"><code>figma_set_page</code><span>Switch the page your agent works on.</span></div>
-            <div class="tool"><code>figma_status</code><span>Check the bridge, open file, and current page.</span></div>
-            <div class="tool"><code>figma_toggle_ui</code><span>Show or hide the plugin window when needed.</span></div>
+        <section id="cara-kerja"><div class="flow"><div class="section-label">Cara kerja</div><h2>Data berjalan secara lokal di komputer Anda.</h2><div class="flow-row"><div class="node"><small>Tempat meminta</small><strong>Aplikasi AI</strong></div><div class="arrow">→</div><div class="node"><small>Penghubung lokal</small><strong>Open Figma MCP</strong></div><div class="arrow">→</div><div class="node"><small>Tempat bekerja</small><strong>File Figma terbuka</strong></div></div></div></section>
+
+        <section id="bantuan">
+          <div class="section-label">Bantuan</div><h2>Jika sesuatu tidak berjalan.</h2><p class="section-intro">Sebagian besar masalah selesai dengan membuka ulang plugin atau aplikasi AI. Cocokkan pesan yang Anda lihat dengan daftar berikut.</p>
+          <div class="faq">
+            <details><summary>Terminal menampilkan “node: command not found”</summary><p>Node.js belum terpasang. Buka <a href="https://nodejs.org/en/download">nodejs.org/en/download</a>, unduh versi LTS, jalankan installernya, lalu tutup dan buka kembali Terminal. Ulangi <code>node --version</code>.</p></details>
+            <details><summary>Installer mengatakan “Figma settings not found”</summary><p>Pastikan Figma Desktop pernah dibuka dan Anda sudah login. Installer akan menampilkan lokasi file <code>manifest.json</code>. Di Figma pilih <strong>Plugins → Development → Import plugin from manifest…</strong>, lalu pilih file tersebut.</p></details>
+            <details><summary>Plugin terbuka tetapi titiknya tidak hijau</summary><p>Pastikan aplikasi AI sudah direstart setelah konfigurasi MCP disimpan. Tutup lalu buka kembali plugin Open Figma MCP. Pastikan hanya satu aplikasi yang memakai port 3055, kemudian coba minta AI “periksa status Figma”.</p></details>
+            <details><summary>Aplikasi AI tidak menampilkan tools Figma</summary><p>Periksa kembali path pada konfigurasi. Path harus sama persis dengan yang dicetak installer dan biasanya berakhir dengan <code>/.local/bin/open-figma-mcp</code>. Simpan konfigurasi lalu restart aplikasi AI sepenuhnya.</p></details>
+            <details><summary>Apakah jendela plugin boleh ditutup?</summary><p>Jangan ditutup selama Anda ingin AI mengakses Figma. Jendela boleh diperkecil atau dipindahkan. Jika tertutup, jalankan kembali melalui <strong>Plugins → Development → Open Figma MCP</strong>.</p></details>
+            <details><summary>Bagaimana cara update?</summary><p>Jalankan kembali command instalasi yang sama di Terminal. Installer akan mengambil release terbaru dan mempertahankan nama command yang sama.</p></details>
+            <details><summary>Bagaimana cara menghapusnya?</summary><p>Jalankan: <code>curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash -s -- --uninstall</code>. Command dan plugin development akan dihapus dari komputer.</p></details>
+            <details><summary>Apakah ini aman untuk file penting?</summary><p>Server berjalan lokal, tetapi tools dapat membaca dan mengubah file Figma yang terbuka sesuai instruksi AI. Gunakan version history Figma, baca konfirmasi tool, dan lakukan percobaan pertama pada duplikat file.</p></details>
           </div>
         </section>
 
-        <section class="cta">
-          <div class="cta-box">
-            <h2>Make the first connection.</h2>
-            <p>Run the same command later whenever you want to update.</p>
-            <div class="command" data-copy>
-              <code>curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash</code>
-              <button type="button">Copy</button>
-            </div>
-          </div>
-        </section>
+        <section class="cta"><div class="cta-box"><h2>Siap mencoba?</h2><p>Simpan pekerjaan Figma Anda, buka Terminal, lalu salin command ini. Menjalankan command yang sama di kemudian hari juga akan melakukan update.</p><div class="command" data-copy><code>curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash</code><button type="button">Salin</button></div></div></section>
       </main>
 
-      <footer>
-        <span>Open Figma MCP · MIT licensed</span>
-        <span>Built for local-first design automation.</span>
-      </footer>
+      <footer><span>Open Figma MCP · Open source · Lisensi MIT</span><span>Dibuat agar otomasi desain lokal lebih mudah dipakai.</span></footer>
     </div>
-
     <script>
       document.querySelectorAll('[data-copy]').forEach((block) => {
         const button = block.querySelector('button');
         const command = block.querySelector('code').textContent;
         button.addEventListener('click', async () => {
-          await navigator.clipboard.writeText(command);
-          button.textContent = 'Copied!';
-          window.setTimeout(() => { button.textContent = 'Copy'; }, 1600);
+          try { await navigator.clipboard.writeText(command); button.textContent = 'Tersalin!'; }
+          catch { const range = document.createRange(); range.selectNodeContents(block.querySelector('code')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); button.textContent = 'Tekan ⌘C'; }
+          window.setTimeout(() => { button.textContent = 'Salin'; }, 1800);
         });
       });
     </script>

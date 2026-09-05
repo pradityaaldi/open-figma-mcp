@@ -19,6 +19,9 @@ the UI holds the socket, the main thread does the work, `postMessage` joins them
 
 ## Quick start
 
+> **New to Terminal or MCP?** Follow the visual, step-by-step guide for
+> designers at [pradityaaldi.github.io/open-figma-mcp](https://pradityaaldi.github.io/open-figma-mcp/).
+
 ```bash
 # Install the server and register the plugin in Figma desktop
 curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash
