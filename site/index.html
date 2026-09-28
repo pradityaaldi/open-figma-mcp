@@ -59,8 +59,8 @@
       .warning { border-left-color:#e79a21; background:#fff2d7; color:#76500e; }
       .config { margin-top:16px; padding:18px; overflow-x:auto; border-radius:13px; background:#1b1917; color:#f9f3e8; font:600 12px/1.65 ui-monospace,monospace; }
       .config .accent { color:var(--lime); }
-      .client-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:18px; } .client { border:1px solid var(--line); border-radius:13px; padding:16px; }
-      .client strong { display:block; margin-bottom:6px; } .client span { color:var(--muted); font-size:13px; line-height:1.5; }
+      .client-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:18px; } .client { border:1px solid var(--line); border-radius:13px; padding:16px; }
+      .client strong { display:block; margin-bottom:6px; } .client span { color:var(--muted); font-size:13px; line-height:1.5; } .client code { font-size:12px; overflow-wrap:anywhere; color:var(--ink); }
       .flow { background:var(--ink); color:var(--paper); border-radius:28px; padding:clamp(28px,5vw,60px); box-shadow:var(--shadow); overflow:hidden; position:relative; }
       .flow::after { content:""; position:absolute; width:230px; height:230px; border:55px solid var(--violet); border-radius:50%; right:-130px; top:-130px; opacity:.8; }
       .flow h2 { margin-bottom:50px; } .flow-row { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:center; gap:18px; position:relative; z-index:1; }
@@ -99,7 +99,7 @@
           <div class="requirements">
             <article class="requirement"><span class="check">✓</span><h3>Mac atau Linux</h3><p>Installer otomatis saat ini belum mendukung Windows.</p></article>
             <article class="requirement"><span class="check">✓</span><h3>Figma Desktop</h3><p>Gunakan aplikasi desktop, bukan Figma di browser.</p></article>
-            <article class="requirement"><span class="check">✓</span><h3>Aplikasi AI + MCP</h3><p>Contohnya Claude, Cursor, atau aplikasi lain yang menerima MCP lokal.</p></article>
+            <article class="requirement"><span class="check">✓</span><h3>Aplikasi AI + MCP</h3><p>Contohnya Claude, Cursor, Command Code, atau aplikasi lain yang menerima MCP lokal.</p></article>
             <article class="requirement"><span class="check">✓</span><h3>Node.js 20+</h3><p>Program pendukung gratis. Cara mengeceknya ada di langkah 3.</p></article>
           </div>
         </section>
@@ -130,7 +130,7 @@
 
             <article class="step"><div class="step-number">05</div><div class="step-body">
               <div><h3>Simpan konfigurasi yang muncul</h3><p>Di akhir pemasangan, Terminal menampilkan kotak teks bernama <strong>MCP client configuration</strong>. Jangan mengetik ulang. Salin seluruh bagian dari kurung kurawal pembuka sampai penutup.</p><div class="config">{<br>&nbsp; "mcpServers": {<br>&nbsp;&nbsp;&nbsp; <span class="accent">"open-figma-mcp"</span>: {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "command": <span class="accent">"/Users/nama-anda/.local/bin/open-figma-mcp"</span><br>&nbsp;&nbsp;&nbsp; }<br>&nbsp; }<br>}</div><div class="expected"><strong>Penting:</strong> path setiap komputer berbeda. Gunakan konfigurasi yang benar-benar muncul di Terminal Anda, bukan contoh di atas.</div></div>
-              <div><h3>Masukkan ke aplikasi AI</h3><p>Cari menu pengaturan MCP pada aplikasi AI Anda. Nama menunya dapat sedikit berbeda antarversi.</p><div class="client-grid"><div class="client"><strong>Cursor</strong><span>Settings → Tools &amp; Integrations → MCP Tools → tambahkan server custom.</span></div><div class="client"><strong>Claude Desktop</strong><span>Settings → Extensions atau Developer → tambahkan MCP lokal. Restart aplikasi setelah menyimpan.</span></div><div class="client"><strong>Aplikasi lain</strong><span>Cari “MCP Servers”, “Tools”, atau “Integrations”, lalu gunakan konfigurasi JSON tadi.</span></div></div></div>
+              <div><h3>Masukkan ke aplikasi AI</h3><p>Cari menu pengaturan MCP pada aplikasi AI Anda. Nama menunya dapat sedikit berbeda antarversi.</p><div class="client-grid"><div class="client"><strong>Cursor</strong><span>Settings → Tools &amp; Integrations → MCP Tools → tambahkan server custom.</span></div><div class="client"><strong>Claude Desktop</strong><span>Settings → Extensions atau Developer → tambahkan MCP lokal. Restart aplikasi setelah menyimpan.</span></div><div class="client"><strong>Command Code / Claude Code</strong><span>Di Terminal: <code>cmd mcp add --scope user open-figma-mcp -- PATH</code> (atau <code>claude mcp add</code> dengan format sama). PATH = nilai "command" di atas. Cek dengan <code>/mcp</code>.</span></div><div class="client"><strong>Aplikasi lain</strong><span>Cari “MCP Servers”, “Tools”, atau “Integrations”, lalu gunakan konfigurasi JSON tadi.</span></div></div></div>
             </div></article>
 
             <article class="step"><div class="step-number">06</div><div class="step-body">

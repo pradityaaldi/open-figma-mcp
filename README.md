@@ -68,6 +68,24 @@ back to printing the manifest path so you can use
 **Plugins → Development → Import plugin from manifest…** instead. That path
 always works; only the desktop app can load a local development plugin.
 
+### Terminal agents
+
+Claude Code and [Command Code](https://commandcode.ai/docs/mcp) register stdio
+servers with one command. `--scope user` makes the server available in every
+project:
+
+```bash
+# Claude Code
+claude mcp add --scope user open-figma-mcp -- ~/.local/bin/open-figma-mcp
+
+# Command Code
+cmd mcp add --scope user open-figma-mcp -- ~/.local/bin/open-figma-mcp
+```
+
+Inside a session, `/mcp` shows whether the server is connected. Both agents can
+run at the same time: the first one to start owns the bridge port and the
+others relay through it, so they share one Figma plugin connection.
+
 ### Other MCP clients
 
 Any client that speaks stdio MCP works. Cursor / Windsurf / Claude Desktop:
@@ -94,13 +112,42 @@ when run from this directory. `npm start` runs the server directly.
 
 | Tool | What it does |
 | --- | --- |
-| `figma_exec` | Run arbitrary Plugin API JavaScript. This is the workhorse. |
-| `figma_screenshot` | Export a node as PNG, returned inline. |
+| `figma_build` | Build a layout from a JSON node tree, live on canvas, one node at a time. |
+| `figma_exec` | Run arbitrary Plugin API JavaScript — edits, queries, anything else. |
+| `figma_screenshot` | Export a node as PNG (longest edge capped at 1600px), returned inline. |
 | `figma_get_metadata` | Structural outline — ids, names, types, sizes, text. |
 | `figma_get_selection` | What the user has selected right now. |
 | `figma_get_pages` | List document pages. |
 | `figma_set_page` | Switch the active page. |
 | `figma_status` | Connection state plus the open file and page. |
+
+### Building live with `figma_build`
+
+The model describes the design as JSON instead of writing Plugin API code. The
+plugin loads every font up front in parallel, then creates nodes one at a time
+and yields between them so Figma repaints. You watch the design being assembled,
+and the viewport follows it. Top-level nodes land to the right of existing
+content, so nothing overlaps.
+
+```json
+{"node": {"name": "Card", "layout": "column", "width": 320, "padding": 24, "gap": 12,
+  "fill": "#FFFFFF", "radius": 16, "shadow": {"y": 8, "blur": 24, "color": "#1018281A"},
+  "children": [
+    {"type": "TEXT", "text": "Welcome back", "fontSize": 24, "fontWeight": 700},
+    {"name": "Button", "layout": "row", "width": "fill", "padding": [12, 16],
+     "align": "center", "fill": "#2B5CFF", "radius": 8,
+     "children": [{"type": "TEXT", "text": "Continue", "fontWeight": 600, "color": "#FFFFFF"}]}
+  ]}}
+```
+
+Sizes are a number, `"hug"`, or `"fill"`. Fills take hex (`#RRGGBBAA` for alpha),
+gradients (`{"gradient": ["#a", "#b"], "angle": 90}`), or raw Figma paints. The
+full field list is in the tool description the model sees. `stepDelay` (default
+30 ms) sets the pace; `0` builds as fast as possible.
+
+Progress streams back while a build runs. Each node resets the bridge timeout,
+so long builds do not time out, and clients that send a `progressToken` receive
+MCP progress notifications.
 
 ### Writing `figma_exec` code
 
@@ -119,12 +166,15 @@ figma.currentPage.appendChild(frame);
 return { createdNodeIds: [frame.id] };
 ```
 
-Three helpers are injected:
+Four helpers are injected:
 
 - `color('#2B5CFF')` — hex to Figma's 0–1 RGB.
 - `await loadFontsFor(textNode)` — loads every font a text node already uses,
   which is what you need before editing existing text.
 - `outline(node, depth)` — structural dump of a subtree.
+- `await step(node?, delayMs?)` — lets the canvas repaint, scrolls to a top-level
+  node, and reports progress. Call it after each section so an imperative
+  script also builds visibly instead of appearing all at once.
 
 The Plugin API rules that cause most failures:
 
@@ -166,7 +216,7 @@ No Figma instance required.
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `BRIDGE_PORT` | `3055` | WebSocket port the plugin dials. |
-| `BRIDGE_TIMEOUT` | `30000` | Milliseconds before a pending command gives up. |
+| `BRIDGE_TIMEOUT` | `30000` | Milliseconds of plugin silence before a pending command gives up. Progress events reset it. |
 
 Change the port in both your MCP client config (`BRIDGE_PORT`) and the plugin's URL field if 3055 is taken.
 
@@ -174,7 +224,8 @@ Change the port in both your MCP client config (`BRIDGE_PORT`) and the plugin's 
 
 - One Figma file at a time — whichever file has the plugin open.
 - The plugin window must stay open.
-- Long-running scripts hit `BRIDGE_TIMEOUT`; split large jobs into several calls.
+- A script that runs longer than `BRIDGE_TIMEOUT` without calling `step()` times
+  out; `figma_build` reports progress automatically.
 - Only the desktop app can load a local development plugin.
 
 ## Relationship to the official server

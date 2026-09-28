@@ -70,6 +70,7 @@ plugin.on('message', (raw) => {
   if (command === 'ping') {
     plugin.send(JSON.stringify({ id, ok: true, data: { file: 'Shared File', page: 'Page 1' } }));
   } else if (command === 'exec') {
+    plugin.send(JSON.stringify({ type: 'progress', id, done: 1, message: 'step' }));
     plugin.send(JSON.stringify({ id, ok: true, data: { echoed: params.code } }));
   }
 });

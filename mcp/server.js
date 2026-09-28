@@ -72,18 +72,15 @@ wss.on('connection', (ws) => {
 
     const forwardedEntry = forwarded.get(msg.id);
     if (forwardedEntry) {
-      forwarded.delete(msg.id);
+      // Progress events precede the result; only the result ends the request.
+      if (msg.type !== 'progress') forwarded.delete(msg.id);
       if (forwardedEntry.relay.readyState === WebSocket.OPEN) {
         forwardedEntry.relay.send(JSON.stringify({ ...msg, id: forwardedEntry.originalId }));
       }
       return;
     }
 
-    const entry = pending.get(msg.id);
-    if (!entry) return;
-    pending.delete(msg.id);
-    clearTimeout(entry.timer);
-    entry.resolve(msg);
+    settle(msg);
   });
 
   ws.on('close', () => {
@@ -145,11 +142,7 @@ function connectRelay() {
     } catch {
       return;
     }
-    const entry = pending.get(msg.id);
-    if (!entry) return;
-    pending.delete(msg.id);
-    clearTimeout(entry.timer);
-    entry.resolve(msg);
+    settle(msg);
   });
 
   const reconnect = () => {
@@ -165,7 +158,23 @@ function connectRelay() {
   ws.on('error', (e) => log('relay error:', e.message));
 }
 
-function send(command, params = {}) {
+// Route a plugin message to its waiting caller. A progress event keeps the
+// request alive (the timeout measures silence, not total duration) and is
+// passed on; anything else is the final result.
+function settle(msg) {
+  const entry = pending.get(msg.id);
+  if (!entry) return;
+  if (msg.type === 'progress') {
+    entry.arm();
+    entry.onProgress?.(msg);
+    return;
+  }
+  pending.delete(msg.id);
+  clearTimeout(entry.timer);
+  entry.resolve(msg);
+}
+
+function send(command, params = {}, onProgress) {
   return new Promise((resolve, reject) => {
     if (!plugin || plugin.readyState !== 1) {
       reject(
@@ -177,26 +186,31 @@ function send(command, params = {}) {
       return;
     }
     const id = String(++seq);
-    const timer = setTimeout(() => {
-      pending.delete(id);
-      reject(new Error(`Timed out after ${TIMEOUT_MS}ms waiting for the plugin`));
-    }, TIMEOUT_MS);
-
-    pending.set(id, { resolve, timer });
+    const entry = { resolve, onProgress, timer: null };
+    entry.arm = () => {
+      clearTimeout(entry.timer);
+      entry.timer = setTimeout(() => {
+        pending.delete(id);
+        reject(new Error(`Timed out after ${TIMEOUT_MS}ms without a response from the plugin`));
+      }, TIMEOUT_MS);
+    };
+    entry.arm();
+    pending.set(id, entry);
     plugin.send(JSON.stringify({ id, command, params }));
   });
 }
 
 // A plugin-side throw is a normal outcome, not a transport failure — surface the
 // message to the model so it can correct the script.
-async function call(command, params) {
-  const res = await send(command, params);
+async function call(command, params, onProgress) {
+  const res = await send(command, params, onProgress);
   if (!res.ok) throw new Error(res.error + (res.stack ? '\n' + res.stack : ''));
   return res.data;
 }
 
 const text = (v) => ({
-  content: [{ type: 'text', text: typeof v === 'string' ? v : JSON.stringify(v, null, 2) }],
+  // Compact JSON: indentation roughly doubles the tokens the model has to read.
+  content: [{ type: 'text', text: typeof v === 'string' ? v : JSON.stringify(v) }],
 });
 
 // ------------------------------------------------------------------- MCP side
@@ -208,8 +222,13 @@ Whatever you \`return\` is JSON-serialized and sent back — that is the only ou
 (\`console.log\` is not captured). Node objects in the return value are collapsed to
 {id, name, type, x, y, width, height}.
 
+Prefer figma_build for creating new layouts — it is faster to write and builds live on canvas.
+Use figma_exec for edits, queries, and anything figma_build cannot express.
+
 Injected helpers: \`color('#2B5CFF')\` -> Figma RGB; \`await loadFontsFor(textNode)\` loads every
-font a text node already uses; \`outline(node, depth)\` returns a structural dump.
+font a text node already uses; \`outline(node, depth)\` returns a structural dump;
+\`await step(node?)\` repaints the canvas (and scrolls to a top-level node) so the user watches
+the build progress — call it after appending each section when creating many nodes.
 
 Rules that bite:
 - Colors are 0-1, not 0-255.
@@ -228,7 +247,73 @@ Example:
   figma.currentPage.appendChild(f);
   return { createdNodeIds: [f.id] };`;
 
+const BUILD_DESCRIPTION = `Build a design from a JSON node tree. Nodes appear on canvas one at a time
+so the user watches it being assembled; the viewport follows the build. All fonts load up front.
+Returns {rootIds, count, nodes:[{id,name,type}]}.
+
+Node spec (every field optional except where noted):
+  type: FRAME (default) | TEXT | RECTANGLE | ELLIPSE | LINE | SVG | COMPONENT | INSTANCE | POLYGON | STAR
+  name, x, y (ignored inside auto-layout unless position:"absolute"), width, height
+    width/height: number (fixed) | "hug" | "fill" (fill needs an auto-layout parent)
+  fill: "#hex" | "#RRGGBBAA" | {gradient:["#a","#b"], angle:180} | [paints] | "none"
+  stroke: "#hex", strokeWidth, strokeAlign: inside|center|outside, dash:[4,4]
+  radius: number | [tl,tr,br,bl]; opacity; rotation; clip: bool; visible: false
+  shadow: {x,y,blur,spread,color:"#00000033",inner} or an array; blur; backgroundBlur
+  Auto layout: layout: "row" | "column", gap: number | "auto" (space-between),
+    padding: n | [v,h] | [t,r,b,l], align/crossAlign: start|center|end|between|baseline,
+    wrap: true, wrapGap
+  TEXT: text (required), fontFamily (default Inter), fontWeight 100-900 or fontStyle "Semi Bold",
+    italic, fontSize, lineHeight (px or "150%"), letterSpacing, textAlign: left|center|right|justified,
+    color: "#hex", textCase: upper|lower|title, textDecoration: underline|strikethrough
+    A text with width "fill" or a number wraps; otherwise it grows to fit.
+  SVG: svg: "<svg ...>" markup
+  INSTANCE: componentId or componentKey, properties: {variant/prop overrides}
+  position: "absolute" — ignore parent auto layout; index — insert position within the parent
+  props: {anyPluginApiProperty: value} — raw escape hatch applied last
+  children: [node, ...]
+
+Frames without fill are transparent, except a top-level frame (white by default). Top-level
+nodes without x/y are placed to the right of existing content so nothing overlaps.
+
+Example:
+{"node":{"name":"Card","layout":"column","width":320,"padding":24,"gap":12,"fill":"#FFFFFF",
+ "radius":16,"shadow":{"y":8,"blur":24,"color":"#1018281A"},"children":[
+  {"type":"TEXT","text":"Welcome back","fontSize":24,"fontWeight":700,"color":"#101828"},
+  {"type":"TEXT","text":"Sign in to continue","fontSize":14,"color":"#667085","width":"fill"},
+  {"name":"Button","layout":"row","width":"fill","padding":[12,16],"align":"center",
+   "fill":"#2B5CFF","radius":8,"children":[
+    {"type":"TEXT","text":"Continue","fontWeight":600,"color":"#FFFFFF"}]}]}}`;
+
+const NODE_SCHEMA = {
+  type: 'object',
+  description: 'Node spec — see the tool description for fields.',
+  additionalProperties: true,
+};
+
 const TOOLS = [
+  {
+    name: 'figma_build',
+    description: BUILD_DESCRIPTION,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        node: NODE_SCHEMA,
+        nodes: { type: 'array', items: NODE_SCHEMA, description: 'Several top-level trees, built in order.' },
+        parentId: {
+          type: 'string',
+          description: 'Append into this existing node instead of the current page.',
+        },
+        stepDelay: {
+          type: 'number',
+          description: 'Milliseconds to pause after each node so the canvas repaints. Default 30; 0 is fastest.',
+        },
+        focus: {
+          type: 'boolean',
+          description: 'Follow the build with the viewport and select the result. Default true.',
+        },
+      },
+    },
+  },
   {
     name: 'figma_exec',
     description: EXEC_DESCRIPTION,
@@ -249,7 +334,11 @@ const TOOLS = [
       type: 'object',
       properties: {
         nodeId: { type: 'string', description: 'Node id, e.g. "50:417". Defaults to selection.' },
-        scale: { type: 'number', description: 'Export scale, default 1. Use 0.5 for large frames.' },
+        scale: { type: 'number', description: 'Export scale, default 1.' },
+        maxSize: {
+          type: 'number',
+          description: 'Cap on the longest edge in pixels, default 1600. Large frames are scaled down to fit.',
+        },
       },
     },
   },
@@ -306,22 +395,57 @@ const TOOLS = [
 ];
 
 const server = new Server(
-  { name: 'open-figma-mcp', version: '1.0.0' },
+  { name: 'open-figma-mcp', version: '0.2.0' },
   { capabilities: { tools: {} } }
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TOOLS }));
 
-server.setRequestHandler(CallToolRequestSchema, async (req) => {
+server.setRequestHandler(CallToolRequestSchema, async (req, extra) => {
   const { name, arguments: args = {} } = req.params;
+
+  // Forward plugin progress as MCP progress notifications when the client asked
+  // for them. Clients show these as a live status while a build runs.
+  const progressToken = req.params._meta?.progressToken;
+  let lastProgress = 0;
+  const onProgress = progressToken === undefined
+    ? undefined
+    : (p) => {
+        const progress = Math.max(lastProgress + 1e-6, p.done ?? lastProgress + 1);
+        lastProgress = progress;
+        extra.sendNotification({
+          method: 'notifications/progress',
+          params: {
+            progressToken,
+            progress,
+            ...(p.total ? { total: p.total } : {}),
+            ...(p.message ? { message: p.message } : {}),
+          },
+        }).catch(() => {});
+      };
 
   try {
     switch (name) {
+      case 'figma_build':
+        return text(
+          await call(
+            'build',
+            {
+              node: args.node,
+              nodes: args.nodes,
+              parentId: args.parentId,
+              stepDelay: args.stepDelay,
+              focus: args.focus,
+            },
+            onProgress
+          )
+        );
+
       case 'figma_exec':
-        return text(await call('exec', { code: args.code }));
+        return text(await call('exec', { code: args.code }, onProgress));
 
       case 'figma_screenshot': {
-        const r = await call('screenshot', { nodeId: args.nodeId, scale: args.scale });
+        const r = await call('screenshot', { nodeId: args.nodeId, scale: args.scale, maxSize: args.maxSize });
         return {
           content: [
             { type: 'text', text: JSON.stringify(r.meta) },

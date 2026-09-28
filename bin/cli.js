@@ -164,6 +164,7 @@ async function installPlugin(flags) {
   out('');
   out('Next: add the MCP server to your client, e.g.');
   out('  claude mcp add open-figma-mcp --scope user -- open-figma-mcp');
+  out('  cmd mcp add --scope user open-figma-mcp -- open-figma-mcp');
 }
 
 async function uninstallPlugin(flags) {

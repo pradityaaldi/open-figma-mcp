@@ -5,7 +5,8 @@ import { WebSocket } from 'ws';
 
 const PORT = 3199;
 const srv = spawn('node', ['mcp/server.js'], {
-  env: { ...process.env, BRIDGE_PORT: String(PORT) },
+  // Short timeout so the progress test proves progress events keep a request alive.
+  env: { ...process.env, BRIDGE_PORT: String(PORT), BRIDGE_TIMEOUT: '600' },
   stdio: ['pipe', 'pipe', 'pipe'],
 });
 
@@ -13,6 +14,7 @@ srv.stderr.on('data', (d) => process.stderr.write('  [srv] ' + d));
 
 let buf = '';
 const replies = new Map();
+const notifications = [];
 srv.stdout.on('data', (d) => {
   buf += d.toString();
   const lines = buf.split('\n');
@@ -20,6 +22,7 @@ srv.stdout.on('data', (d) => {
   for (const line of lines) {
     if (!line.trim()) continue;
     const msg = JSON.parse(line);
+    if (msg.method) notifications.push(msg);
     const r = replies.get(msg.id);
     if (r) {
       replies.delete(msg.id);
@@ -55,13 +58,13 @@ srv.stdin.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initiali
 
 const tools = await rpc('tools/list', {});
 const names = tools.result.tools.map((t) => t.name);
-check('tools/list returns all 8 tools', names.length === 8, names.join(', '));
+check('tools/list returns all 9 tools', names.length === 9, names.join(', '));
 
 // --- disconnected state ----------------------------------------------------
 const offline = await rpc('tools/call', { name: 'figma_status', arguments: {} });
 check(
   'figma_status reports disconnected before the plugin joins',
-  offline.result.content[0].text.includes('"connected": false')
+  offline.result.content[0].text.includes('"connected":false')
 );
 
 const noPlugin = await rpc('tools/call', {
@@ -88,6 +91,19 @@ ws.on('message', (raw) => {
     if (params.code.includes('boom')) return reply(false, { error: 'boom exploded' });
     return reply(true, { data: { createdNodeIds: ['1:2'], echoed: params.code.length } });
   }
+  if (command === 'build') {
+    // Emit progress for longer than BRIDGE_TIMEOUT before answering.
+    let done = 0;
+    const tick = setInterval(() => {
+      done++;
+      ws.send(JSON.stringify({ type: 'progress', id, done, total: 5, message: 'node ' + done }));
+      if (done === 5) {
+        clearInterval(tick);
+        reply(true, { data: { rootIds: ['9:1'], count: params.node.children.length + 1 } });
+      }
+    }, 250);
+    return;
+  }
   if (command === 'get_pages') return reply(true, { data: [{ id: '0:1', name: 'Page 1', isCurrent: true }] });
   if (command === 'get_metadata') return reply(true, { data: { id: '0:1', type: 'PAGE', children: [] } });
   if (command === 'get_selection') return reply(true, { data: { count: 0, nodes: [] } });
@@ -106,7 +122,7 @@ await sleep(300);
 const status = await rpc('tools/call', { name: 'figma_status', arguments: {} });
 check(
   'figma_status reports the open file once connected',
-  status.result.content[0].text.includes('"connected": true') &&
+  status.result.content[0].text.includes('"connected":true') &&
     status.result.content[0].text.includes('Test File')
 );
 
@@ -128,6 +144,25 @@ check(
   shot.result.content[1].type === 'image' && shot.result.content[1].mimeType === 'image/png'
 );
 
+const build = await rpc('tools/call', {
+  name: 'figma_build',
+  arguments: { node: { name: 'Card', children: [{ type: 'TEXT', text: 'Hi' }] } },
+  _meta: { progressToken: 'build-1' },
+});
+check(
+  'figma_build outlives the timeout while progress keeps arriving',
+  !build.result.isError && build.result.content[0].text.includes('9:1'),
+  build.result.content[0].text
+);
+const progress = notifications.filter(
+  (n) => n.method === 'notifications/progress' && n.params.progressToken === 'build-1'
+);
+check(
+  'build progress is forwarded as MCP progress notifications',
+  progress.length === 5 && progress[4].params.progress === 5 && progress[4].params.total === 5,
+  progress.map((n) => n.params.progress).join(',')
+);
+
 const pages = await rpc('tools/call', { name: 'figma_get_pages', arguments: {} });
 check('figma_get_pages lists pages', pages.result.content[0].text.includes('Page 1'));
 
@@ -140,7 +175,7 @@ await sleep(300);
 const afterClose = await rpc('tools/call', { name: 'figma_status', arguments: {} });
 check(
   'status flips back to disconnected when the plugin closes',
-  afterClose.result.content[0].text.includes('"connected": false')
+  afterClose.result.content[0].text.includes('"connected":false')
 );
 
 srv.kill();

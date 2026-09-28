@@ -40,10 +40,15 @@
   let ws = null;
   let retry = null;
   let manualStop = false;
+  let backoff = 500;
 
+  // Bounded so a long session does not slow the hidden iframe down.
+  const lines = [];
   function log(msg) {
+    lines.push(msg);
+    if (lines.length > 200) lines.shift();
     const el = $('log');
-    el.textContent += msg + '\n';
+    el.textContent = lines.join('\n');
     el.scrollTop = el.scrollHeight;
   }
 
@@ -66,6 +71,7 @@
     ws.onopen = () => {
       setState(true, 'connected');
       log('connected');
+      backoff = 500;
       ws.send(JSON.stringify({ type: 'hello', role: 'plugin' }));
     };
 
@@ -85,35 +91,21 @@
     ws.onclose = () => {
       setState(false, 'disconnected');
       if (!manualStop && $('auto').checked) {
-        retry = setTimeout(connect, 2000);
+        // Reconnect quickly after a server restart, back off if it stays down.
+        retry = setTimeout(connect, backoff);
+        backoff = Math.min(backoff * 2, 4000);
       }
     };
 
     ws.onerror = () => log('socket error');
   }
 
-  // Results come back from code.js; PNG bytes arrive as a number array and are
-  // base64-encoded here because the plugin sandbox has no btoa.
-  const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-  function toBase64(arr) {
-    let out = '';
-    for (let i = 0; i < arr.length; i += 3) {
-      const a = arr[i], b = arr[i + 1], c = arr[i + 2];
-      out += B64[a >> 2];
-      out += B64[((a & 3) << 4) | (b === undefined ? 0 : b >> 4)];
-      out += b === undefined ? '=' : B64[((b & 15) << 2) | (c === undefined ? 0 : c >> 6)];
-      out += c === undefined ? '=' : B64[c & 63];
-    }
-    return out;
-  }
-
+  // Results and progress events come back from code.js already JSON-safe
+  // (screenshots are base64-encoded natively on the main thread).
   window.onmessage = (ev) => {
     const msg = ev.data.pluginMessage;
-    if (!msg || msg.type !== 'result') return;
-    if (msg.ok && msg.data && Array.isArray(msg.data.bytes)) {
-      msg.data = { base64: toBase64(msg.data.bytes), meta: msg.data.meta };
-    }
-    log((msg.ok ? '✓ ' : '✗ ') + (msg.error || 'ok'));
+    if (!msg || (msg.type !== 'result' && msg.type !== 'progress')) return;
+    if (msg.type === 'result') log((msg.ok ? '✓ ' : '✗ ') + (msg.error || 'ok'));
     if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
   };
 

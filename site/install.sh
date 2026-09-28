@@ -176,6 +176,10 @@ MCP client configuration:
   }
 }
 
+Terminal agents (one command each):
+  Claude Code:  claude mcp add --scope user open-figma-mcp -- "$BIN_PATH"
+  Command Code: cmd mcp add --scope user open-figma-mcp -- "$BIN_PATH"
+
 Open a Figma file, then run:
 Plugins → Development → Open Figma MCP
 
