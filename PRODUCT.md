@@ -25,7 +25,7 @@ Unofficial Figma MCP is a self-hosted MCP server plus a Figma development plugin
 
 ## Operating Context
 
-- Install: `curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash` (macOS/Linux, Node.js 20+). The installer registers the plugin in Figma Desktop, which may quit and relaunch Figma once.
+- Install: `curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash` (macOS/Linux). It uses Node.js 20+ when present, otherwise installs a private official Node.js LTS under ~/.local/share/unofficial-figma-mcp/node without sudo; the command is a wrapper that calls that node by absolute path. The installer registers the plugin in Figma Desktop, which may quit and relaunch Figma once.
 - Connect: add the printed command path to the AI client (JSON config, or `claude mcp add` / `cmd mcp add`), then run Plugins → Development → Unofficial Figma MCP in Figma. Development plugins always show Figma's generic icon and a "Development" label.
 - Use: ask the AI to check `figma_status`, read the selection, or build screens.
 

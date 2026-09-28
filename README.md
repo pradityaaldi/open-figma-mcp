@@ -53,9 +53,21 @@ want to install/update the MCP server runtime.
 Maintainers can publish an update by pushing a `v*` tag. The release workflow
 runs the test suite and creates the GitHub Release consumed by the installer.
 
-Requirements: macOS or Linux, Node.js 20 or newer, `curl`, and `npm`. The
-installer writes only to user-owned directories (`~/.local` and
-`~/.unofficial-figma-mcp`) and does not need `sudo`.
+Requirements: macOS or Linux and `curl`. The installer writes only to
+user-owned directories (`~/.local` and `~/.unofficial-figma-mcp`) and does not
+need `sudo`.
+
+Node.js is handled for you. If Node.js 20 or newer is on your `PATH`, the
+installer uses it. Otherwise it downloads the official Node.js LTS build from
+nodejs.org, verifies its SHA-256 checksum, and unpacks it into
+`~/.local/share/unofficial-figma-mcp/node`, where only this app uses it.
+Uninstalling removes it. Pass `--use-bundled-node` to use that private copy
+even when a system Node.js exists.
+
+The installed `unofficial-figma-mcp` command is a small wrapper that runs
+`bin/cli.js` with that Node.js by absolute path. Desktop MCP clients that do not
+inherit your terminal's `PATH` (a common problem with nvm) can therefore still
+start it.
 
 ### What `install-plugin` does
 
