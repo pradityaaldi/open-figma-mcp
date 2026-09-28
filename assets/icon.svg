@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Unofficial Figma MCP: three placed tiles and a fourth being built. -->
+  <rect width="128" height="128" rx="28" fill="#171513"/>
+  <g transform="rotate(-5 64 64)">
+    <rect x="25" y="25" width="36" height="36" rx="10" fill="#F5F0E7"/>
+    <circle cx="85" cy="43" r="18" fill="#7657FF"/>
+    <circle cx="43" cy="85" r="18" fill="#FF6B55"/>
+    <rect x="69" y="69" width="32" height="32" rx="9" fill="#C8FF4A" fill-opacity="0.16" stroke="#C8FF4A" stroke-width="4" stroke-dasharray="7 5.5"/>
+  </g>
+  <path d="M89 86 L89 112 L96 105 L101 115.5 L106 113 L101 102.8 L110.8 102.8 Z" fill="#FFFFFF" stroke="#171513" stroke-width="3.5" stroke-linejoin="round"/>
+</svg>

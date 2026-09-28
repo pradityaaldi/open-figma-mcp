@@ -1,3 +1,5 @@
+<img src="assets/icon-128.png" width="96" height="96" alt="Unofficial Figma MCP icon">
+
 # Unofficial Figma MCP
 
 > Not affiliated with, endorsed by, or sponsored by Figma, Inc. "Figma" is a

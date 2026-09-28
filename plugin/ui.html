@@ -6,7 +6,8 @@
     color: var(--figma-color-text);
     background: var(--figma-color-bg);
   }
-  h1 { font-size: 13px; margin: 0 0 12px; }
+  h1 { font-size: 13px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  h1 svg { flex: none; }
   .row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: #d33; flex: none; }
   .dot.on { background: #1a9e5c; }
@@ -26,7 +27,7 @@
   }
 </style>
 
-<h1>Unofficial Figma MCP</h1>
+<h1><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" viewBox="0 0 128 128"><rect width="20" height="20" aria-hidden="true" rx="28" fill="#171513"/><g transform="rotate(-5 64 64)"><rect x="25" y="25" width="36" height="36" rx="10" fill="#F5F0E7"/><circle cx="85" cy="43" r="18" fill="#7657FF"/><circle cx="43" cy="85" r="18" fill="#FF6B55"/><rect x="69" y="69" width="32" height="32" rx="9" fill="#C8FF4A" fill-opacity="0.16" stroke="#C8FF4A" stroke-width="4" stroke-dasharray="7 5.5"/></g><path d="M89 86 L89 112 L96 105 L101 115.5 L106 113 L101 102.8 L110.8 102.8 Z" fill="#FFFFFF" stroke="#171513" stroke-width="3.5" stroke-linejoin="round"/></svg>Unofficial Figma MCP</h1>
 <div class="row"><span class="dot" id="dot"></span><span id="state">disconnected</span></div>
 <input id="url" value="ws://localhost:3055" />
 <div class="row" style="margin-top:10px">
