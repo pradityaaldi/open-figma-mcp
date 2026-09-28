@@ -1,0 +1,563 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-28T09:25:56+00:00",
+  "title": "Design System: Unofficial Figma MCP",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#F5F0E7",
+        "oklch": "oklch(95.7% 0.013 82.4)",
+        "tonalRamp": [
+          "#0E0B06",
+          "#28251E",
+          "#45413A",
+          "#656159",
+          "#86827A",
+          "#A9A49C",
+          "#CDC8C0",
+          "#F3EEE5"
+        ]
+      },
+      "paper-deep": {
+        "role": "neutral",
+        "displayName": "Deep Paper",
+        "canonical": "#ECE4D5",
+        "oklch": "oklch(92.1% 0.022 83.3)",
+        "tonalRamp": [
+          "#100A03",
+          "#2A2419",
+          "#484135",
+          "#676053",
+          "#898174",
+          "#ACA496",
+          "#D0C8BA",
+          "#F6EEDE"
+        ]
+      },
+      "sheet": {
+        "role": "neutral",
+        "displayName": "Sheet",
+        "canonical": "#FFFBF3",
+        "oklch": "oklch(98.9% 0.011 84.6)",
+        "tonalRamp": [
+          "#0D0B06",
+          "#28251F",
+          "#45423B",
+          "#64615A",
+          "#85827B",
+          "#A8A59D",
+          "#CCC9C1",
+          "#F2EEE6"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#171513",
+        "oklch": "oklch(19.7% 0.005 67.5)",
+        "tonalRamp": [
+          "#0D0B09",
+          "#272522",
+          "#44413F",
+          "#63615E",
+          "#84827F",
+          "#A7A4A2",
+          "#CBC8C6",
+          "#F1EEEB"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Soft Ink",
+        "canonical": "#3A3631",
+        "oklch": "oklch(33.5% 0.010 73.6)",
+        "tonalRamp": [
+          "#0E0B07",
+          "#282420",
+          "#45413C",
+          "#65605B",
+          "#86817C",
+          "#A9A49E",
+          "#CDC8C2",
+          "#F3EEE7"
+        ]
+      },
+      "ink-raised": {
+        "role": "neutral",
+        "displayName": "Raised Ink",
+        "canonical": "#211F1C",
+        "oklch": "oklch(24.0% 0.006 78.2)",
+        "tonalRamp": [
+          "#0D0B08",
+          "#272522",
+          "#44423E",
+          "#63615D",
+          "#84827E",
+          "#A7A5A1",
+          "#CBC9C5",
+          "#F1EEEA"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "#655F56",
+        "oklch": "oklch(48.8% 0.016 78.2)",
+        "tonalRamp": [
+          "#0F0A05",
+          "#29241C",
+          "#474139",
+          "#666057",
+          "#888178",
+          "#ABA49A",
+          "#CFC8BE",
+          "#F4EDE3"
+        ]
+      },
+      "paper-dim": {
+        "role": "neutral",
+        "displayName": "Dim Paper",
+        "canonical": "#D9D2C5",
+        "oklch": "oklch(86.6% 0.019 83.1)",
+        "tonalRamp": [
+          "#0F0A03",
+          "#2A241A",
+          "#474137",
+          "#676055",
+          "#888276",
+          "#ABA498",
+          "#CFC8BB",
+          "#F5EEE0"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "#D8D0C4",
+        "oklch": "oklch(86.1% 0.019 78.2)",
+        "tonalRamp": [
+          "#0F0A04",
+          "#2A241B",
+          "#474137",
+          "#676056",
+          "#898176",
+          "#ACA498",
+          "#D0C8BC",
+          "#F5EDE1"
+        ]
+      },
+      "lime": {
+        "role": "primary",
+        "displayName": "Signal Lime",
+        "canonical": "#C8FF4A",
+        "oklch": "oklch(93.1% 0.208 125.2)",
+        "tonalRamp": [
+          "#060E00",
+          "#1E2A01",
+          "#374A08",
+          "#516C03",
+          "#6D9105",
+          "#8DB627",
+          "#AADF10",
+          "#D9FF97"
+        ]
+      },
+      "lime-wash": {
+        "role": "primary",
+        "displayName": "Lime Wash",
+        "canonical": "#E6F4CC",
+        "oklch": "oklch(94.6% 0.055 123.1)",
+        "tonalRamp": [
+          "#070E00",
+          "#202907",
+          "#3C4725",
+          "#5B6744",
+          "#7C8864",
+          "#9EAB85",
+          "#C2D0A9",
+          "#E7F5CD"
+        ]
+      },
+      "violet": {
+        "role": "secondary",
+        "displayName": "AI Violet",
+        "canonical": "#7657FF",
+        "oklch": "oklch(58.7% 0.236 284.9)",
+        "tonalRamp": [
+          "#0C002F",
+          "#25006B",
+          "#420CAB",
+          "#5E35DE",
+          "#7B65F9",
+          "#9D97F8",
+          "#C3C2FD",
+          "#ECEDFE"
+        ]
+      },
+      "violet-deep": {
+        "role": "secondary",
+        "displayName": "Deep Violet",
+        "canonical": "#5238D6",
+        "oklch": "oklch(48.0% 0.226 281.2)",
+        "tonalRamp": [
+          "#0A0032",
+          "#210769",
+          "#3C02B3",
+          "#553DDB",
+          "#726AF6",
+          "#9698FF",
+          "#C0C4FC",
+          "#EBEDFE"
+        ]
+      },
+      "coral": {
+        "role": "tertiary",
+        "displayName": "Warning Coral",
+        "canonical": "#FF6B55",
+        "oklch": "oklch(70.8% 0.185 30.7)",
+        "tonalRamp": [
+          "#220000",
+          "#4D0000",
+          "#7F0900",
+          "#B21E0C",
+          "#DB4936",
+          "#FC7762",
+          "#FDB4A6",
+          "#FFE9E4"
+        ]
+      },
+      "coral-wash": {
+        "role": "tertiary",
+        "displayName": "Coral Wash",
+        "canonical": "#FFE3DD",
+        "oklch": "oklch(93.7% 0.032 32.1)",
+        "tonalRamp": [
+          "#160604",
+          "#331F1B",
+          "#523C37",
+          "#725B56",
+          "#957C76",
+          "#B89E99",
+          "#DDC2BC",
+          "#FEE9E5"
+        ]
+      },
+      "green": {
+        "role": "neutral",
+        "displayName": "Status Green",
+        "canonical": "#1B7F45",
+        "oklch": "oklch(52.7% 0.126 152.4)",
+        "tonalRamp": [
+          "#001103",
+          "#012E14",
+          "#0B4F28",
+          "#06753B",
+          "#3A985C",
+          "#60BC7E",
+          "#85E1A1",
+          "#CAFED7"
+        ]
+      },
+      "fig-bg": {
+        "role": "illustration",
+        "displayName": "Figma Editor Ground",
+        "canonical": "#1E1E1E",
+        "oklch": "oklch(23.5% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "fig-panel": {
+        "role": "illustration",
+        "displayName": "Figma Panel",
+        "canonical": "#2C2C2C",
+        "oklch": "oklch(29.3% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "fig-text": {
+        "role": "illustration",
+        "displayName": "Figma Panel Text",
+        "canonical": "#F0F0F0",
+        "oklch": "oklch(95.5% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "fig-blue": {
+        "role": "illustration",
+        "displayName": "Figma Selection Blue",
+        "canonical": "#0D99FF",
+        "oklch": "oklch(67.0% 0.183 249.2)",
+        "tonalRamp": [
+          "#000B22",
+          "#022646",
+          "#0B4473",
+          "#0864A9",
+          "#0E86DF",
+          "#52AAFD",
+          "#A2CEFB",
+          "#E2F0FF"
+        ]
+      },
+      "term-bg": {
+        "role": "illustration",
+        "displayName": "Terminal Ground",
+        "canonical": "#1A1917",
+        "oklch": "oklch(21.4% 0.004 84.6)",
+        "tonalRamp": [
+          "#0C0B09",
+          "#262523",
+          "#43423F",
+          "#62615F",
+          "#83827F",
+          "#A6A5A2",
+          "#CAC9C6",
+          "#F0EEEB"
+        ]
+      },
+      "term-text": {
+        "role": "illustration",
+        "displayName": "Terminal Text",
+        "canonical": "#E9E4DA",
+        "oklch": "oklch(92.0% 0.014 84.6)",
+        "tonalRamp": [
+          "#0E0B05",
+          "#28251D",
+          "#464239",
+          "#656158",
+          "#868279",
+          "#A9A49B",
+          "#CDC9BF",
+          "#F3EEE4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline only; emphasized words get a lime highlighter band."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Step titles, definition terms, card titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running instructions in the reader's system font; 16px under 640px."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Hero promise in soft ink, max 36em."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Nav links, chips, buttons, picker label."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Anything typed or pasted: commands, code, terminal output."
+      }
+    },
+    "shadows": [
+      {
+        "name": "desk-object",
+        "value": "0 2px 2px rgba(0,0,0,.08), 0 30px 60px -24px rgba(23,21,19,.55)",
+        "purpose": "App-window illustrations set on the paper."
+      },
+      {
+        "name": "paper-note",
+        "value": "0 1px 1px rgba(23,21,19,.06), 0 14px 34px -12px rgba(23,21,19,.28)",
+        "purpose": "Notes laid over windows and the hero command block."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "purpose": "The single easing for every transition and build-in."
+      },
+      {
+        "name": "rise",
+        "value": "0.45s rise from translateY(8px), staggered per element",
+        "purpose": "Illustration elements assembling step by step."
+      },
+      {
+        "name": "state",
+        "value": "0.2s",
+        "purpose": "Hover and press transitions on buttons, chips, cards."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animations collapse to their finished state",
+        "purpose": "Required under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stack",
+        "value": "1020px"
+      },
+      {
+        "name": "compact",
+        "value": "640px"
+      }
+    ],
+    "focus": {
+      "value": "outline: 3px solid #7657FF; outline-offset: 3px",
+      "purpose": "Global focus-visible ring in AI violet."
+    }
+  },
+  "components": [
+    {
+      "name": "Command Block with Copy",
+      "kind": "custom",
+      "refersTo": "command-block",
+      "description": "Anything the reader types: ink bar, mono text with a lime $ prompt, lime Copy as the primary action.",
+      "html": "<div class=\"ds-cmd\"><code>curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash</code><button class=\"ds-copy\">Copy</button></div>",
+      "css": ":host{--paper:#F5F0E7;--paper-deep:#ECE4D5;--sheet:#FFFBF3;--ink:#171513;--ink-soft:#3A3631;--muted:#655F56;--line:#D8D0C4;--lime:#C8FF4A;--violet:#7657FF;--violet-deep:#5238D6;--coral:#FF6B55;--green:#1B7F45;--display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;--body:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--shadow:0 1px 1px rgba(23,21,19,.06),0 14px 34px -12px rgba(23,21,19,.28);--ease:cubic-bezier(.16,1,.3,1);} .ds-cmd{display:flex;align-items:stretch;border-radius:14px;background:var(--ink);color:var(--paper);box-shadow:var(--shadow);max-width:560px;} .ds-cmd code{flex:1;min-width:0;padding:15px 16px;font:.86rem/1.55 var(--mono);white-space:pre-wrap;word-break:break-all;} .ds-cmd code::before{content:'$ ';color:var(--lime);} .ds-copy{flex:none;margin:6px;border:0;border-radius:10px;padding:0 16px;background:var(--lime);color:var(--ink);font:700 .86rem/1 var(--body);cursor:pointer;transition:background .2s,transform .2s var(--ease);} .ds-copy:hover{background:#D6FF74;} .ds-copy:active{transform:translateY(1px);} .ds-copy:focus-visible{outline:3px solid var(--violet);outline-offset:3px;}"
+    },
+    {
+      "name": "Prompt Card",
+      "kind": "card",
+      "refersTo": "prompt-card",
+      "description": "A natural-language prompt to paste into the AI chat; body font, ink Copy that turns lime when done.",
+      "html": "<div class=\"ds-prompt\"><code>Build a mobile sign-in screen in Figma with an email field and a sign-in button.</code><button class=\"ds-pcopy\">Copy</button></div>",
+      "css": ":host{--paper:#F5F0E7;--paper-deep:#ECE4D5;--sheet:#FFFBF3;--ink:#171513;--ink-soft:#3A3631;--muted:#655F56;--line:#D8D0C4;--lime:#C8FF4A;--violet:#7657FF;--violet-deep:#5238D6;--coral:#FF6B55;--green:#1B7F45;--display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;--body:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--shadow:0 1px 1px rgba(23,21,19,.06),0 14px 34px -12px rgba(23,21,19,.28);--ease:cubic-bezier(.16,1,.3,1);} .ds-prompt{display:flex;align-items:stretch;border-radius:14px;background:var(--sheet);color:var(--ink);border:1px solid var(--line);max-width:520px;} .ds-prompt code{flex:1;padding:15px 16px;font:.98rem/1.55 var(--body);} .ds-pcopy{align-self:center;flex:none;margin:6px;border:0;border-radius:10px;padding:11px 14px;background:var(--ink);color:var(--paper);font:700 .86rem/1 var(--body);cursor:pointer;transition:background .2s;} .ds-pcopy:active{background:var(--lime);color:var(--ink);} .ds-pcopy:focus-visible{outline:3px solid var(--violet);outline-offset:3px;}"
+    },
+    {
+      "name": "App Picker Chips",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Radio-style pill choices; the selected app fills ink and re-speaks the whole guide.",
+      "html": "<div class=\"ds-chips\" role=\"radiogroup\"><button class=\"ds-chip\" role=\"radio\" aria-checked=\"true\">Claude Desktop</button><button class=\"ds-chip\" role=\"radio\" aria-checked=\"false\">Claude Code</button><button class=\"ds-chip\" role=\"radio\" aria-checked=\"false\">Cursor</button></div>",
+      "css": ":host{--paper:#F5F0E7;--paper-deep:#ECE4D5;--sheet:#FFFBF3;--ink:#171513;--ink-soft:#3A3631;--muted:#655F56;--line:#D8D0C4;--lime:#C8FF4A;--violet:#7657FF;--violet-deep:#5238D6;--coral:#FF6B55;--green:#1B7F45;--display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;--body:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--shadow:0 1px 1px rgba(23,21,19,.06),0 14px 34px -12px rgba(23,21,19,.28);--ease:cubic-bezier(.16,1,.3,1);} .ds-chips{display:flex;flex-wrap:wrap;gap:8px;} .ds-chip{border:1.5px solid var(--line);background:var(--sheet);color:var(--ink);border-radius:999px;padding:9px 15px;font:600 .92rem/1 var(--body);cursor:pointer;transition:border-color .2s,background .2s;} .ds-chip:hover{border-color:var(--ink);} .ds-chip[aria-checked='true']{background:var(--ink);border-color:var(--ink);color:var(--paper);} .ds-chip:focus-visible{outline:3px solid var(--violet);outline-offset:3px;}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Sticky blurred paper bar with the tile mark, pill links and the EN/ID toggle.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-brand\" href=\"#\"><svg viewBox=\"0 0 128 128\" width=\"32\" height=\"32\"><rect width=\"128\" height=\"128\" rx=\"28\" fill=\"#171513\"/><g transform=\"rotate(-5 64 64)\"><rect x=\"25\" y=\"25\" width=\"36\" height=\"36\" rx=\"10\" fill=\"#F5F0E7\"/><circle cx=\"85\" cy=\"43\" r=\"18\" fill=\"#7657FF\"/><circle cx=\"43\" cy=\"85\" r=\"18\" fill=\"#FF6B55\"/><rect x=\"69\" y=\"69\" width=\"32\" height=\"32\" rx=\"9\" fill=\"#C8FF4A\" fill-opacity=\".16\" stroke=\"#C8FF4A\" stroke-width=\"4\" stroke-dasharray=\"7 5.5\"/></g></svg>Unofficial Figma MCP</a><div class=\"ds-links\"><a href=\"#\">Setup</a><a href=\"#\">Prompts</a><a href=\"#\">Compare</a></div><div class=\"ds-lang\"><button aria-pressed=\"true\">EN</button><button aria-pressed=\"false\">ID</button></div></nav>",
+      "css": ":host{--paper:#F5F0E7;--paper-deep:#ECE4D5;--sheet:#FFFBF3;--ink:#171513;--ink-soft:#3A3631;--muted:#655F56;--line:#D8D0C4;--lime:#C8FF4A;--violet:#7657FF;--violet-deep:#5238D6;--coral:#FF6B55;--green:#1B7F45;--display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;--body:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--shadow:0 1px 1px rgba(23,21,19,.06),0 14px 34px -12px rgba(23,21,19,.28);--ease:cubic-bezier(.16,1,.3,1);} .ds-nav{display:flex;align-items:center;gap:20px;height:68px;padding:0 16px;background:rgba(245,240,231,.88);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line);color:var(--ink);} .ds-brand{display:flex;align-items:center;gap:10px;font:800 1.05rem var(--display);letter-spacing:-.02em;text-decoration:none;color:inherit;} .ds-links{display:flex;gap:4px;margin-left:auto;} .ds-links a{padding:8px 12px;border-radius:999px;font:600 .92rem var(--body);text-decoration:none;color:inherit;} .ds-links a:hover{background:var(--paper-deep);} .ds-lang{display:flex;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--sheet);} .ds-lang button{border:0;background:none;font:700 .78rem/1 var(--body);letter-spacing:.04em;padding:7px 10px;border-radius:999px;cursor:pointer;color:var(--muted);} .ds-lang button[aria-pressed='true']{background:var(--ink);color:var(--paper);} .ds-nav a:focus-visible{outline:3px solid var(--violet);outline-offset:3px;}"
+    },
+    {
+      "name": "Callouts",
+      "kind": "card",
+      "refersTo": "callout-ok",
+      "description": "Expected result (lime wash), warning with fix (coral wash), tip (deep paper).",
+      "html": "<div class=\"ds-call ds-ok\"><svg viewBox=\"0 0 20 20\" width=\"20\" height=\"20\"><circle cx=\"10\" cy=\"10\" r=\"9\" fill=\"#1B7F45\"/><path d=\"M6 10.5l2.5 2.5L14 7.5\" stroke=\"#fff\" stroke-width=\"2\" fill=\"none\"/></svg><div><strong>You see v20 or higher</strong>Go to step 2.</div></div><div class=\"ds-call ds-warn\"><svg viewBox=\"0 0 20 20\" width=\"20\" height=\"20\"><circle cx=\"10\" cy=\"10\" r=\"9\" fill=\"#FF6B55\"/><path d=\"M10 5v6M10 14v.5\" stroke=\"#fff\" stroke-width=\"2\"/></svg><div><strong>command not found</strong>Install Node.js, then reopen Terminal.</div></div>",
+      "css": ":host{--paper:#F5F0E7;--paper-deep:#ECE4D5;--sheet:#FFFBF3;--ink:#171513;--ink-soft:#3A3631;--muted:#655F56;--line:#D8D0C4;--lime:#C8FF4A;--violet:#7657FF;--violet-deep:#5238D6;--coral:#FF6B55;--green:#1B7F45;--display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;--body:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--shadow:0 1px 1px rgba(23,21,19,.06),0 14px 34px -12px rgba(23,21,19,.28);--ease:cubic-bezier(.16,1,.3,1);} .ds-call{display:grid;grid-template-columns:22px 1fr;gap:10px;margin-top:12px;padding:14px 16px;border-radius:12px;font:.95rem/1.5 var(--body);color:var(--ink);max-width:460px;} .ds-call strong{display:block;} .ds-ok{background:#E6F4CC;} .ds-warn{background:#FFE3DD;}"
+    },
+    {
+      "name": "Connected Status",
+      "kind": "chip",
+      "refersTo": "status-connected",
+      "description": "The done state: lime pill with a live green dot, used when the plugin connects.",
+      "html": "<span class=\"ds-connected\"><i></i>Connected to Figma</span>",
+      "css": ":host{--paper:#F5F0E7;--paper-deep:#ECE4D5;--sheet:#FFFBF3;--ink:#171513;--ink-soft:#3A3631;--muted:#655F56;--line:#D8D0C4;--lime:#C8FF4A;--violet:#7657FF;--violet-deep:#5238D6;--coral:#FF6B55;--green:#1B7F45;--display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;--body:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--shadow:0 1px 1px rgba(23,21,19,.06),0 14px 34px -12px rgba(23,21,19,.28);--ease:cubic-bezier(.16,1,.3,1);} .ds-connected{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;background:var(--lime);color:var(--ink);font:700 .82rem/1 var(--body);} .ds-connected i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(27,127,69,.2);}"
+    },
+    {
+      "name": "Step Number",
+      "kind": "custom",
+      "refersTo": "step-number",
+      "description": "Tile-mark geometry: an ink rounded square rotated -5deg holding a lime numeral.",
+      "html": "<span class=\"ds-step\">1</span>",
+      "css": ":host{--paper:#F5F0E7;--paper-deep:#ECE4D5;--sheet:#FFFBF3;--ink:#171513;--ink-soft:#3A3631;--muted:#655F56;--line:#D8D0C4;--lime:#C8FF4A;--violet:#7657FF;--violet-deep:#5238D6;--coral:#FF6B55;--green:#1B7F45;--display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;--body:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--shadow:0 1px 1px rgba(23,21,19,.06),0 14px 34px -12px rgba(23,21,19,.28);--ease:cubic-bezier(.16,1,.3,1);} .ds-step{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:13px;background:var(--ink);color:var(--lime);font:800 1.2rem/1 var(--display);transform:rotate(-5deg);}"
+    },
+    {
+      "name": "Link Card",
+      "kind": "card",
+      "refersTo": "link-card",
+      "description": "Sheet card pointing to a primary source; border darkens and card lifts 2px on hover.",
+      "html": "<a class=\"ds-linkcard\" href=\"#\"><b>Build an MCP server</b><span>The official Model Context Protocol tutorial.</span><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M7 17L17 7M9 7h8v8\"/></svg></a>",
+      "css": ":host{--paper:#F5F0E7;--paper-deep:#ECE4D5;--sheet:#FFFBF3;--ink:#171513;--ink-soft:#3A3631;--muted:#655F56;--line:#D8D0C4;--lime:#C8FF4A;--violet:#7657FF;--violet-deep:#5238D6;--coral:#FF6B55;--green:#1B7F45;--display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;--body:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--shadow:0 1px 1px rgba(23,21,19,.06),0 14px 34px -12px rgba(23,21,19,.28);--ease:cubic-bezier(.16,1,.3,1);} .ds-linkcard{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:16px 18px;border-radius:14px;background:var(--sheet);border:1px solid var(--line);color:var(--ink);text-decoration:none;max-width:420px;transition:border-color .2s,transform .25s var(--ease);} .ds-linkcard:hover{border-color:var(--ink);transform:translateY(-2px);} .ds-linkcard b{font:700 1.08rem var(--display);letter-spacing:-.01em;} .ds-linkcard span{grid-column:1;color:var(--muted);font:.92rem var(--body);} .ds-linkcard svg{grid-row:1/span 2;grid-column:2;align-self:center;} .ds-linkcard:focus-visible{outline:3px solid var(--violet);outline-offset:3px;}"
+    },
+    {
+      "name": "App Window",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Signature illustration shell: faithful macOS window with traffic lights, 14px corners and the desk-object shadow.",
+      "html": "<div class=\"ds-win\"><div class=\"ds-bar\"><span class=\"ds-lights\"><i></i><i></i><i></i></span><span class=\"ds-title\">Terminal</span></div><div class=\"ds-term\"><span style=\"color:#C8FF4A\">~ %</span> node -v\nv22.11.0</div></div>",
+      "css": ":host{--paper:#F5F0E7;--paper-deep:#ECE4D5;--sheet:#FFFBF3;--ink:#171513;--ink-soft:#3A3631;--muted:#655F56;--line:#D8D0C4;--lime:#C8FF4A;--violet:#7657FF;--violet-deep:#5238D6;--coral:#FF6B55;--green:#1B7F45;--display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;--body:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--shadow:0 1px 1px rgba(23,21,19,.06),0 14px 34px -12px rgba(23,21,19,.28);--ease:cubic-bezier(.16,1,.3,1);} .ds-win{border-radius:14px;overflow:hidden;box-shadow:0 2px 2px rgba(0,0,0,.08),0 30px 60px -24px rgba(23,21,19,.55);background:#1A1917;color:#E9E4DA;max-width:460px;} .ds-bar{display:flex;align-items:center;gap:8px;height:36px;padding:0 14px;background:#2B2926;color:#9A948A;font:600 .74rem var(--body);} .ds-lights{display:flex;gap:7px;} .ds-lights i{width:11px;height:11px;border-radius:50%;background:#FF5F57;} .ds-lights i:nth-child(2){background:#FEBC2E;} .ds-lights i:nth-child(3){background:#28C840;} .ds-title{flex:1;text-align:center;margin-right:44px;} .ds-term{padding:16px 18px 20px;font:.8rem/1.7 var(--mono);white-space:pre-wrap;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Designer's Desk",
+    "overview": "The system is a warm paper desk with real app windows laid on it. The ground is uncoated paper, type is ink, and the only saturated colors are the three from the 2x2 tile mark: lime, violet and coral. Each one carries a fixed meaning, so color works as a signal rather than a decoration. Illustrations are faithful reproductions of the tools the reader will actually touch (macOS Terminal, Figma's dark editor, a code editor, an AI chat), each set on the paper as an object with a soft cast shadow, and small paper notes lie across them at a slight tilt.\n\nDensity is generous and reading-first: long single-column text measures (36-46em), wide section padding, and paired text-and-illustration rows that collapse to one column below 1020px. Display type is a heavy, tightly tracked Bricolage Grotesque; running text stays in the reader's system sans so instructions read like the operating system they are about. Motion is purposeful: illustrations assemble step by step with a single expo-out ease, and every animation resolves to its finished state under reduced motion.\n\nThe one full-bleed inversion is ink: a dark section flips the palette (paper type on ink, lime as the \"yes\" signal) for dense comparative material.",
+    "keyCharacteristics": [
+      "Paper ground, ink type, three signal colors from the tile mark.",
+      "Lime means action and done; violet means the AI; coral means warning or \"no\".",
+      "Illustrations are faithful app windows set on paper like desk objects.",
+      "Heavy, tight grotesque display over system-sans body; JetBrains Mono for anything typed.",
+      "Pills for choices, 12-14px corners for surfaces, a 28px corner for the one lime closing panel.",
+      "Small deliberate tilts (-5deg for the mark and step numbers, -2deg for notes laid on windows)."
+    ],
+    "rules": [
+      {
+        "name": "The Four Inks Rule",
+        "body": "Lime is action and done, violet is the AI, coral is warning. Never swap their meanings, and never introduce a fourth saturated brand hue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lime Needs Ink Rule",
+        "body": "Lime is a ground or a mark on ink, never text on paper. Text on lime is always ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The Typed Things Are Mono Rule",
+        "body": "Anything the reader types, pastes or sees in a terminal is JetBrains Mono. Prompts meant for the AI chat are plain body text, because they are natural language.",
+        "section": "typography"
+      },
+      {
+        "name": "The Desk Object Rule",
+        "body": "Only illustrated windows and the notes laid on them cast shadows. Page components stay flat and use tone or a 1px line for separation.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep lime for action and done, violet for the AI, coral for warnings (The Four Inks Rule).",
+      "**Do** put ink text on lime and lime only on ink or as a ground.",
+      "**Do** draw illustrations as faithful app windows with a title bar, 14px corners and the desk-object shadow.",
+      "**Do** set anything typed or pasted in JetBrains Mono inside an ink command block with a lime Copy button.",
+      "**Do** use pills for choices and statuses, 12-14px corners for surfaces.",
+      "**Do** tilt the tile mark and step-number tiles -5deg and laid-on notes -2deg, and no further.",
+      "**Do** give every animation a finished, static state under prefers-reduced-motion."
+    ],
+    "donts": [
+      "**Don't** use Figma's logo or imply affiliation with Figma, Inc.",
+      "**Don't** add a fourth saturated brand hue or swap the meaning of lime, violet and coral.",
+      "**Don't** set lime text on paper.",
+      "**Don't** cast shadows on page components; shadows belong to desk objects only.",
+      "**Don't** restyle the reproduced app chrome (fig-*, term-*) into brand colors; it must look like the real app."
+    ]
+  }
+}
