@@ -184,6 +184,7 @@
       .steps { list-style: none; margin: 24px 0 0; padding: 0; counter-reset: step; }
       .step { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(28px, 5vw, 72px); align-items: start; padding: 56px 0; border-top: 1px solid var(--line); }
       .step:first-child { border-top: 0; }
+      .step > div { min-width: 0; }
       .step-num { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; background: var(--ink); color: var(--lime); font: 800 1.2rem/1 var(--display); margin-bottom: 16px; transform: rotate(-5deg); }
       .step h3 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); }
       .step-text > p { margin-top: 14px; color: var(--ink-soft); }
@@ -199,6 +200,20 @@
       .replay svg { width: 14px; height: 14px; }
       .caption { margin-top: 14px; font-size: .86rem; color: var(--muted); }
 
+      .dl { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; padding: 12px 18px; border-radius: 12px; background: var(--ink); color: var(--paper); font-weight: 700; text-decoration: none; transition: transform .2s var(--ease); }
+      .dl:hover { transform: translateY(-1px); }
+      .dl svg { width: 16px; height: 16px; }
+      .browser { background: #F3F3F3; color: #222; }
+      .browser .win-bar { background: #E6E6E6; color: #555; }
+      .url { flex: 1; margin: 0 8px 0 14px; padding: 5px 12px; border-radius: 8px; background: #fff; border: 1px solid #D6D6D6; font: 500 .74rem var(--body); color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .browser-body { display: grid; place-items: center; height: 140px; padding: 0 16px 20px; }
+      .app-win .win { box-shadow: 0 2px 2px rgba(0,0,0,.08), 0 30px 60px -24px rgba(23,21,19,.55); }
+      .menubar { display: flex; gap: 14px; padding: 6px 14px; margin-bottom: 8px; border-radius: 8px; background: rgba(250,248,244,.96); box-shadow: var(--shadow); color: #222; font-size: .74rem; white-space: nowrap; overflow: hidden; }
+      .app-body { display: grid; place-items: center; height: 150px; padding: 0 16px; background-color: var(--fig-bg); background-image: radial-gradient(#353535 1px, transparent 1px); background-size: 18px 18px; }
+      .verdict { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 9px 14px; border-radius: 999px; font: 700 .84rem/1.2 var(--body); text-align: left; }
+      .verdict svg { width: 18px; height: 18px; flex: none; }
+      .verdict.bad { background: #FFE3DD; color: #7E2A1B; }
+      .verdict.good { background: var(--lime); color: var(--ink); }
       /* Terminal */
       .term { background: var(--term-bg); color: var(--term-text); }
       .term .win-bar { background: #2B2926; color: var(--term-dim); }
@@ -253,6 +268,7 @@
       .connected i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px rgba(27,127,69,.2); }
       .term-pill { margin-top: 6px; }
       .desk-obj { position: relative; z-index: 1; width: 82%; margin: -22px 0 0 auto; rotate: -2deg; }
+      .app-win.desk-obj { margin-top: -30px; }
       .desk-obj .mini-canvas { margin: 0; border-radius: 0; padding: 18px 14px 14px; }
       .mini-canvas { display: grid; grid-template-columns: 1fr 1.6fr 1fr; gap: 10px; align-items: end; margin-top: 4px; padding: 16px 12px 12px; border-radius: 12px; background: var(--fig-bg); background-image: radial-gradient(#353535 1px, transparent 1px); background-size: 14px 14px; }
       .mf { display: grid; gap: 4px; padding: 7px; border-radius: 6px; background: #F8FAFC; }
@@ -480,12 +496,12 @@
 
       <section class="setup" id="setup" aria-labelledby="setup-title">
         <div class="wrap">
-          <h2 id="setup-title"><span data-l="en">Set it up in five steps.</span><span data-l="id">Pasang dalam lima langkah.</span></h2>
-          <p class="intro" data-l="en">You'll paste one line into Terminal, connect your AI app, and run one plugin in Figma. Every step shows what you should see, and what to do if you don't.</p>
-          <p class="intro" data-l="id">Anda hanya menempel satu baris ke Terminal, menghubungkan aplikasi AI, dan menjalankan satu plugin di Figma. Setiap langkah menunjukkan apa yang seharusnya muncul, dan apa yang dilakukan jika tidak.</p>
+          <h2 id="setup-title"><span data-l="en">Set it up in six steps.</span><span data-l="id">Pasang dalam enam langkah.</span></h2>
+          <p class="intro" data-l="en">You'll check for Figma Desktop, paste one line into Terminal, connect your AI app, and run one plugin in Figma. Every step shows what you should see, and what to do if you don't.</p>
+          <p class="intro" data-l="id">Anda hanya memastikan Figma Desktop ada, menempel satu baris ke Terminal, menghubungkan aplikasi AI, dan menjalankan satu plugin di Figma. Setiap langkah menunjukkan apa yang seharusnya muncul, dan apa yang dilakukan jika tidak.</p>
           <ul class="needs" aria-label="What you need">
             <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>Mac <span data-l="en">or</span><span data-l="id">atau</span> Linux <small data-l="en">· Windows not yet</small><small data-l="id">· belum Windows</small></span></li>
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>Figma Desktop <small data-l="en">· not the browser</small><small data-l="id">· bukan browser</small></span></li>
+            <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>Figma Desktop <small data-l="en">· step 1 helps</small><small data-l="id">· dibantu di langkah 1</small></span></li>
             <li><svg aria-hidden="true"><use href="#i-check"/></svg><span data-l="en">An AI app with MCP</span><span data-l="id">Aplikasi AI dengan MCP</span></li>
             <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>Node.js <small data-l="en">· installed for you if missing</small><small data-l="id">· dipasang otomatis bila belum ada</small></span></li>
           </ul>
@@ -508,12 +524,41 @@
             <li class="step">
               <div class="step-text">
                 <span class="step-num" aria-hidden="true">1</span>
+                <h3 data-l="en">Get Figma Desktop</h3><h3 data-l="id">Siapkan Figma Desktop</h3>
+                <p data-l="en">The plugin only runs in the Figma desktop app, not in a browser tab.</p>
+                <p data-l="id">Plugin hanya berjalan di aplikasi Figma Desktop, bukan di tab browser.</p>
+                <ol data-l="en"><li>Press <kbd>⌘</kbd> <kbd>Space</kbd> and type <strong>Figma</strong>. If <strong>Figma.app</strong> shows up, open it and sign in.</li><li>No Figma app? Download it, open the downloaded file, drag Figma into <strong>Applications</strong>, then open it and sign in once.</li></ol>
+                <ol data-l="id"><li>Tekan <kbd>⌘</kbd> <kbd>Space</kbd> lalu ketik <strong>Figma</strong>. Jika <strong>Figma.app</strong> muncul, buka dan login.</li><li>Belum punya aplikasinya? Unduh, buka file unduhannya, seret Figma ke <strong>Applications</strong>, lalu buka dan login sekali.</li></ol>
+                <a class="dl" href="https://www.figma.com/downloads/"><span data-l="en">Download Figma Desktop</span><span data-l="id">Unduh Figma Desktop</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+                <div class="ok"><svg aria-hidden="true"><use href="#i-check"/></svg><div><strong data-l="en">Figma opens as its own app</strong><strong data-l="id">Figma terbuka sebagai aplikasi sendiri</strong><span data-l="en">You'll see Figma, File, Edit… Plugins in the menu bar at the top of your screen. A figma.com tab in Chrome or Safari won't work.</span><span data-l="id">Di menu bar paling atas layar ada Figma, File, Edit… Plugins. Tab figma.com di Chrome atau Safari tidak akan bisa.</span></div></div>
+                <div class="tip"><svg aria-hidden="true"><use href="#i-tip"/></svg><div><span data-l="en">Open Figma Desktop and sign in at least once before step 2. The installer registers the plugin in the desktop app's settings.</span><span data-l="id">Buka Figma Desktop dan login minimal sekali sebelum langkah 2. Installer mendaftarkan plugin di pengaturan aplikasi desktop.</span></div></div>
+              </div>
+              <div class="scene" data-scene>
+                <div class="win browser" data-t style="--t:0" role="img" aria-label="A figma.com tab in a web browser, marked as not working for local plugins">
+                  <div class="win-bar"><span class="lights"><i></i><i></i><i></i></span><span class="url">figma.com/design/…</span></div>
+                  <div class="browser-body"><span class="verdict bad"><svg aria-hidden="true"><use href="#i-warn"/></svg><span data-l="en">Browser tab: local plugins can't run here</span><span data-l="id">Tab browser: plugin lokal tidak bisa jalan</span></span></div>
+                </div>
+                <div class="desk-obj app-win" data-t style="--t:.9" role="img" aria-label="The Figma desktop app with its menu bar, marked as the right one">
+                  <div class="menubar"><b>Figma</b><span>File</span><span>Edit</span><span>View</span><span>Object</span><span>Text</span><span>Arrange</span><span>Plugins</span><span>Window</span><span>Help</span></div>
+                  <div class="win fig">
+                    <div class="win-bar"><span class="lights"><i></i><i></i><i></i></span><span class="win-title">My design — Figma</span></div>
+                    <div class="app-body"><span class="verdict good"><svg aria-hidden="true"><use href="#i-check"/></svg><span data-l="en">Figma Desktop: this is the one</span><span data-l="id">Figma Desktop: ini yang benar</span></span></div>
+                  </div>
+                </div>
+                <button class="replay" type="button" data-replay><svg aria-hidden="true"><use href="#i-replay"/></svg><span data-l="en">Replay</span><span data-l="id">Putar ulang</span></button>
+              </div>
+            </li>
+
+            <!-- Step 2 -->
+            <li class="step">
+              <div class="step-text">
+                <span class="step-num" aria-hidden="true">2</span>
                 <h3 data-l="en">Open Terminal and install</h3><h3 data-l="id">Buka Terminal dan pasang</h3>
                 <ol data-l="en"><li>Save your Figma work: the installer may quit and reopen Figma once to register the plugin.</li><li>Press <kbd>⌘</kbd> <kbd>Space</kbd>, type <strong>Terminal</strong>, press <kbd>Enter</kbd>.</li><li>Copy the line below, paste it into Terminal with <kbd>⌘</kbd> <kbd>V</kbd>, press <kbd>Enter</kbd>. It takes one to three minutes.</li></ol>
                 <ol data-l="id"><li>Simpan pekerjaan Figma: installer mungkin menutup lalu membuka ulang Figma sekali untuk mendaftarkan plugin.</li><li>Tekan <kbd>⌘</kbd> <kbd>Space</kbd>, ketik <strong>Terminal</strong>, tekan <kbd>Enter</kbd>.</li><li>Salin baris di bawah, tempel ke Terminal dengan <kbd>⌘</kbd> <kbd>V</kbd>, tekan <kbd>Enter</kbd>. Prosesnya satu sampai tiga menit.</li></ol>
                 <div class="cmd"><code>curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash</code><button class="copy" type="button" data-copy>Copy</button></div>
                 <div class="tip"><svg aria-hidden="true"><use href="#i-tip"/></svg><div><strong data-l="en">No Node.js? No problem.</strong><strong data-l="id">Belum punya Node.js? Tidak masalah.</strong><span data-l="en">The installer looks for Node.js 20 or newer. If it's missing or too old, it downloads the official Node.js LTS from nodejs.org, checks its checksum, and keeps it inside the app's own folder. No admin password, and any Node.js you already have stays untouched.</span><span data-l="id">Installer mencari Node.js 20 atau lebih baru. Jika belum ada atau terlalu lama, installer mengunduh Node.js LTS resmi dari nodejs.org, memeriksa checksum-nya, dan menyimpannya di folder aplikasi sendiri. Tanpa password admin, dan Node.js yang sudah Anda punya tidak diubah.</span></div></div>
-                <div class="ok"><svg aria-hidden="true"><use href="#i-check"/></svg><div><strong data-l="en">It ends with “Unofficial Figma MCP is installed.”</strong><strong data-l="id">Diakhiri “Unofficial Figma MCP is installed.”</strong><span data-l="en">Below it you'll see your command path and an “MCP client configuration” block. Keep the window open for step 2.</span><span data-l="id">Di bawahnya ada path command Anda dan blok “MCP client configuration”. Biarkan jendela terbuka untuk langkah 2.</span></div></div>
+                <div class="ok"><svg aria-hidden="true"><use href="#i-check"/></svg><div><strong data-l="en">It ends with “Unofficial Figma MCP is installed.”</strong><strong data-l="id">Diakhiri “Unofficial Figma MCP is installed.”</strong><span data-l="en">Below it you'll see your command path and an “MCP client configuration” block. Keep the window open for step 3.</span><span data-l="id">Di bawahnya ada path command Anda dan blok “MCP client configuration”. Biarkan jendela terbuka untuk langkah 3.</span></div></div>
                 <div class="tip"><svg aria-hidden="true"><use href="#i-tip"/></svg><div><span data-l="en">Installs only for your user account, in <code>~/.local</code> and <code>~/.unofficial-figma-mcp</code>. No <code>sudo</code>, no Figma API key. Run the same line again later to update.</span><span data-l="id">Hanya terpasang untuk akun Anda, di <code>~/.local</code> dan <code>~/.unofficial-figma-mcp</code>. Tanpa <code>sudo</code>, tanpa API key Figma. Jalankan baris yang sama nanti untuk update.</span></div></div>
               </div>
               <div class="scene" data-scene>
@@ -538,10 +583,10 @@
               </div>
             </li>
 
-            <!-- Step 2 -->
+            <!-- Step 3 -->
             <li class="step">
               <div class="step-text">
-                <span class="step-num" aria-hidden="true">2</span>
+                <span class="step-num" aria-hidden="true">3</span>
                 <h3><span data-l="en">Connect it to </span><span data-l="id">Hubungkan ke </span><span data-for="claude-desktop">Claude Desktop</span><span data-for="claude-code">Claude Code</span><span data-for="command-code">Command Code</span><span data-for="cursor">Cursor</span><span data-for="other"><span data-l="en">your AI app</span><span data-l="id">aplikasi AI Anda</span></span></h3>
 
                 <div data-for="claude-desktop">
@@ -588,10 +633,10 @@
               </div>
             </li>
 
-            <!-- Step 3 -->
+            <!-- Step 4 -->
             <li class="step">
               <div class="step-text">
-                <span class="step-num" aria-hidden="true">3</span>
+                <span class="step-num" aria-hidden="true">4</span>
                 <h3 data-l="en">Run the plugin in Figma</h3><h3 data-l="id">Jalankan plugin di Figma</h3>
                 <ol data-l="en"><li>Open a design file in <strong>Figma Desktop</strong>. A copy of a real file is a good first playground.</li><li>Press <kbd>⌘</kbd> <kbd>/</kbd> to search, type <strong>Unofficial</strong>, and choose <strong>Unofficial Figma MCP</strong>. Or use <strong>Plugins → Development → Unofficial Figma MCP</strong>.</li></ol>
                 <ol data-l="id"><li>Buka file desain di <strong>Figma Desktop</strong>. Salinan file sungguhan cocok untuk percobaan pertama.</li><li>Tekan <kbd>⌘</kbd> <kbd>/</kbd> untuk mencari, ketik <strong>Unofficial</strong>, lalu pilih <strong>Unofficial Figma MCP</strong>. Atau lewat <strong>Plugins → Development → Unofficial Figma MCP</strong>.</li></ol>
@@ -615,15 +660,15 @@
               </div>
             </li>
 
-            <!-- Step 4 -->
+            <!-- Step 5 -->
             <li class="step">
               <div class="step-text">
-                <span class="step-num" aria-hidden="true">4</span>
+                <span class="step-num" aria-hidden="true">5</span>
                 <h3 data-l="en">Check the connection</h3><h3 data-l="id">Cek koneksinya</h3>
                 <p><span data-l="en">In </span><span data-l="id">Di </span><span data-for="claude-desktop">Claude Desktop</span><span data-for="claude-code">Claude Code (<code>claude</code>)</span><span data-for="command-code">Command Code (<code>cmd</code>)</span><span data-for="cursor">Cursor</span><span data-for="other"><span data-l="en">your AI app</span><span data-l="id">aplikasi AI Anda</span></span><span data-l="en">, start a new chat and send:</span><span data-l="id">, mulai chat baru dan kirim:</span></p>
                 <div class="cmd prompt"><code data-l="en">Is Figma connected? Which file and page am I on?</code><code data-l="id">Apakah Figma sudah terhubung? File dan halaman apa yang sedang saya buka?</code><button class="copy" type="button" data-copy>Copy</button></div>
                 <div class="ok"><svg aria-hidden="true"><use href="#i-check"/></svg><div><strong data-l="en">It names your file and page</strong><strong data-l="id">AI menyebut nama file dan halaman Anda</strong><span data-l="en">Behind the scenes it used the <code>figma_status</code> tool. You're connected.</span><span data-l="id">Di baliknya AI memakai tool <code>figma_status</code>. Anda sudah terhubung.</span></div></div>
-                <div class="warn"><svg aria-hidden="true"><use href="#i-warn"/></svg><div><span data-l="en">“Plugin not connected”? Run the plugin again (step 3). If the AI has no Figma tools at all, restart the AI app and recheck step 2. More in <a href="#help">Help</a>.</span><span data-l="id">“Plugin not connected”? Jalankan lagi plugin (langkah 3). Jika AI tidak punya tool Figma sama sekali, restart aplikasi AI dan cek ulang langkah 2. Lebih lanjut di <a href="#help">Bantuan</a>.</span></div></div>
+                <div class="warn"><svg aria-hidden="true"><use href="#i-warn"/></svg><div><span data-l="en">“Plugin not connected”? Run the plugin again (step 4). If the AI has no Figma tools at all, restart the AI app and recheck step 3. More in <a href="#help">Help</a>.</span><span data-l="id">“Plugin not connected”? Jalankan lagi plugin (langkah 4). Jika AI tidak punya tool Figma sama sekali, restart aplikasi AI dan cek ulang langkah 3. Lebih lanjut di <a href="#help">Bantuan</a>.</span></div></div>
               </div>
               <div class="scene" data-scene>
                 <div class="win chat" data-for="claude-desktop cursor other" role="img" aria-label="Chat: the AI calls figma_status and replies that Figma is connected">
@@ -643,10 +688,10 @@
               </div>
             </li>
 
-            <!-- Step 5 -->
+            <!-- Step 6 -->
             <li class="step">
               <div class="step-text">
-                <span class="step-num" aria-hidden="true">5</span>
+                <span class="step-num" aria-hidden="true">6</span>
                 <h3 data-l="en">Ask for your first design</h3><h3 data-l="id">Minta desain pertama Anda</h3>
                 <p data-l="en">Describe a screen. Keep Figma visible: the layers arrive one by one.</p>
                 <p data-l="id">Jelaskan sebuah layar. Biarkan Figma terlihat: lapisannya muncul satu per satu.</p>
@@ -804,11 +849,11 @@
           <div class="faq">
             <details><summary><span data-l="en">Do I need to install Node.js myself?</span><span data-l="id">Apakah saya harus memasang Node.js sendiri?</span></summary><div><p data-l="en">No. If Node.js 20 or newer is already installed, the installer uses it. Otherwise it downloads the official LTS build from nodejs.org into <code>~/.local/share/unofficial-figma-mcp/node</code>, just for this app; uninstalling removes it too. To always use that private copy, even when you have Node.js:</p><p data-l="id">Tidak. Jika Node.js 20 atau lebih baru sudah terpasang, installer memakainya. Jika belum, installer mengunduh build LTS resmi dari nodejs.org ke <code>~/.local/share/unofficial-figma-mcp/node</code>, khusus untuk aplikasi ini; uninstall ikut menghapusnya. Untuk selalu memakai salinan pribadi itu, meski Anda punya Node.js:</p><div class="cmd"><code>curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash -s -- --use-bundled-node</code><button class="copy" type="button" data-copy>Copy</button></div></div></details>
             <details><summary><span data-l="en">The installer says “Figma settings not found”</span><span data-l="id">Installer menampilkan “Figma settings not found”</span></summary><div><p data-l="en">Open Figma Desktop at least once and sign in, then run the installer again. Or register the plugin by hand: in Figma choose <strong>Plugins → Development → Import plugin from manifest…</strong> and pick the <code>manifest.json</code> path the installer printed.</p><p data-l="id">Buka Figma Desktop minimal sekali dan login, lalu jalankan installer lagi. Atau daftarkan plugin manual: di Figma pilih <strong>Plugins → Development → Import plugin from manifest…</strong> lalu pilih path <code>manifest.json</code> yang dicetak installer.</p></div></details>
-            <details><summary><span data-l="en">The AI says the plugin isn't connected</span><span data-l="id">AI bilang plugin belum terhubung</span></summary><div><p data-l="en">Run the plugin again in the file you want to work on (step 3). It stops when you close that file or Figma. If it still fails, fully quit and reopen your AI app.</p><p data-l="id">Jalankan lagi plugin di file yang ingin dikerjakan (langkah 3). Plugin berhenti saat file atau Figma ditutup. Jika masih gagal, tutup penuh lalu buka lagi aplikasi AI Anda.</p></div></details>
+            <details><summary><span data-l="en">The AI says the plugin isn't connected</span><span data-l="id">AI bilang plugin belum terhubung</span></summary><div><p data-l="en">Run the plugin again in the file you want to work on (step 4). It stops when you close that file or Figma. If it still fails, fully quit and reopen your AI app.</p><p data-l="id">Jalankan lagi plugin di file yang ingin dikerjakan (langkah 4). Plugin berhenti saat file atau Figma ditutup. Jika masih gagal, tutup penuh lalu buka lagi aplikasi AI Anda.</p></div></details>
             <details><summary><span data-l="en">My AI app doesn't show any Figma tools</span><span data-l="id">Aplikasi AI tidak menampilkan tool Figma</span></summary><div><p data-l="en">Check the path in your MCP settings. It must match the one the installer printed exactly and usually ends in <code>/.local/bin/unofficial-figma-mcp</code>. Save, then fully restart the AI app.</p><p data-l="id">Periksa path di pengaturan MCP. Harus sama persis dengan yang dicetak installer dan biasanya berakhir dengan <code>/.local/bin/unofficial-figma-mcp</code>. Simpan, lalu restart penuh aplikasi AI.</p></div></details>
             <details><summary><span data-l="en">Nothing appears when I run the plugin</span><span data-l="id">Tidak ada yang muncul saat plugin dijalankan</span></summary><div><p data-l="en">That's expected. The plugin runs in the background without a window. Ask your AI “Is Figma connected?” to confirm.</p><p data-l="id">Itu memang begitu. Plugin berjalan di latar belakang tanpa jendela. Tanyakan ke AI “Apakah Figma sudah terhubung?” untuk memastikan.</p></div></details>
             <details><summary><span data-l="en">Can I use two AI apps at once?</span><span data-l="id">Bisa pakai dua aplikasi AI sekaligus?</span></summary><div><p data-l="en">Yes. The first app to start owns the connection on port 3055 and the others relay through it, so they all share the same Figma plugin.</p><p data-l="id">Bisa. Aplikasi yang pertama jalan memegang koneksi di port 3055 dan yang lain menumpang lewatnya, jadi semuanya berbagi plugin Figma yang sama.</p></div></details>
-            <details><summary><span data-l="en">How do I update or uninstall?</span><span data-l="id">Bagaimana cara update atau uninstall?</span></summary><div><p data-l="en">To update, run the install line from step 1 again. To remove the command and the plugin:</p><p data-l="id">Untuk update, jalankan lagi baris instalasi dari langkah 1. Untuk menghapus command dan plugin:</p><div class="cmd"><code>curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash -s -- --uninstall</code><button class="copy" type="button" data-copy>Copy</button></div></div></details>
+            <details><summary><span data-l="en">How do I update or uninstall?</span><span data-l="id">Bagaimana cara update atau uninstall?</span></summary><div><p data-l="en">To update, run the install line from step 2 again. To remove the command and the plugin:</p><p data-l="id">Untuk update, jalankan lagi baris instalasi dari langkah 2. Untuk menghapus command dan plugin:</p><div class="cmd"><code>curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash -s -- --uninstall</code><button class="copy" type="button" data-copy>Copy</button></div></div></details>
             <details><summary><span data-l="en">Is it safe for important files?</span><span data-l="id">Aman untuk file penting?</span></summary><div><p data-l="en">The server runs locally, but the AI can read and change the open file when you ask it to. Work in a duplicate at first, read what the AI says it will do, and use Figma's version history to roll back.</p><p data-l="id">Server berjalan lokal, tetapi AI bisa membaca dan mengubah file yang terbuka sesuai permintaan Anda. Awali di file duplikat, baca apa yang akan dilakukan AI, dan pakai version history Figma untuk kembali.</p></div></details>
           </div>
         </div>
@@ -819,8 +864,8 @@
           <div class="close-box">
             <svg class="tiles" viewBox="0 0 128 128" aria-hidden="true"><g transform="rotate(-5 64 64)"><rect x="25" y="25" width="36" height="36" rx="10" fill="#171513"/><circle cx="85" cy="43" r="18" fill="#7657FF"/><circle cx="43" cy="85" r="18" fill="#FF6B55"/><rect x="69" y="69" width="32" height="32" rx="9" fill="none" stroke="#171513" stroke-width="3" stroke-dasharray="7 5.5"/></g></svg>
             <h2 id="close-title"><span data-l="en">Save your work, open Terminal, paste this.</span><span data-l="id">Simpan pekerjaan, buka Terminal, tempel ini.</span></h2>
-            <p data-l="en">The same line installs and later updates it. Then follow steps 2 to 5 above.</p>
-            <p data-l="id">Baris yang sama untuk memasang dan nanti meng-update. Lalu ikuti langkah 2 sampai 5 di atas.</p>
+            <p data-l="en">The same line installs and later updates it. Then follow steps 3 to 6 above.</p>
+            <p data-l="id">Baris yang sama untuk memasang dan nanti meng-update. Lalu ikuti langkah 3 sampai 6 di atas.</p>
             <div class="cmd"><code>curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash</code><button class="copy" type="button" data-copy>Copy</button></div>
           </div>
         </div>

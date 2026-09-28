@@ -21,7 +21,7 @@ THESIS: The guide is a path the reader tailors: pick your AI app once and every 
 
 OWN-WORLD: Warm paper ground (#F5F0E7) with ink (#171513) type; lime (#C8FF4A) marks action and "done", violet (#7657FF) marks the AI, coral (#FF6B55) marks warnings. Illustrations are faithful app windows (macOS Terminal, Figma's dark editor, AI chat) set on the paper like objects on a desk. Display in Bricolage Grotesque, code in JetBrains Mono. The 2x2 tile mark.
 
-STORY: The visitor sees an AI build a Figma screen node by node, understands it works without Figma's quotas and why Figma's own servers are not enough, picks their app, follows five illustrated steps to a green "connected", and leaves with prompts to try and links to the primary docs.
+STORY: The visitor sees an AI build a Figma screen node by node, understands it works without Figma's quotas and why Figma's own servers are not enough, picks their app, follows six illustrated steps to a green "connected", and leaves with prompts to try and links to the primary docs.
 
 FIRST VIEWPORT: Left five columns: headline, one-line promise, the install command with Copy as the primary action, a quiet link to the comparison. Right seven columns: a Figma editor window where a login card builds itself node by node while a layers panel fills and an AI chat bubble narrates. Below the fold edge: the app chips row.
 
