@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "open-figma-mcp": {
+    "unofficial-figma-mcp": {
       "command": "node",
       "args": ["mcp/server.js"],
       "env": {

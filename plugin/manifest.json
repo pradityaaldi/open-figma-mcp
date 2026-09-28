@@ -1,6 +1,6 @@
 {
-  "name": "Open Figma MCP",
-  "id": "open-figma-mcp-local",
+  "name": "Unofficial Figma MCP",
+  "id": "unofficial-figma-mcp-local",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",

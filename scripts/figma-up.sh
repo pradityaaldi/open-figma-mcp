@@ -21,14 +21,14 @@ open -a Figma "figma://file/${FILE_KEY}"
 echo "waiting for Figma to load the file..."
 sleep 20
 
-# 3. Click Plugins > Development > Open Figma MCP. Dev plugins cannot autostart,
+# 3. Click Plugins > Development > Unofficial Figma MCP. Dev plugins cannot autostart,
 #    so this is scripted UI automation — the one manual step, automated.
 osascript <<'EOF'
 tell application "Figma" to activate
 delay 2
 tell application "System Events"
   tell process "Figma"
-    click menu item "Open Figma MCP" of menu of menu item "Development" of menu of menu bar item "Plugins" of menu bar 1
+    click menu item "Unofficial Figma MCP" of menu of menu item "Development" of menu of menu bar item "Plugins" of menu bar 1
   end tell
 end tell
 EOF

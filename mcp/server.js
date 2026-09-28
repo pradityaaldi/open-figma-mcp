@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Open Figma MCP server.
+// Unofficial Figma MCP server.
 //
 // One process, two faces:
 //   - stdio  : speaks MCP to any MCP client (Claude Code, Cursor, etc.)
@@ -60,7 +60,7 @@ wss.on('connection', (ws) => {
         ws.send(JSON.stringify({
           id: msg.id,
           ok: false,
-          error: 'Figma plugin not connected. Open Open Figma MCP in Figma.',
+          error: 'Figma plugin not connected. Run Unofficial Figma MCP in Figma.',
         }));
         return;
       }
@@ -179,7 +179,7 @@ function send(command, params = {}, onProgress) {
     if (!plugin || plugin.readyState !== 1) {
       reject(
         new Error(
-          'Figma plugin not connected. In Figma: Plugins > Development > Open Figma MCP, ' +
+          'Figma plugin not connected. In Figma: Plugins > Development > Unofficial Figma MCP, ' +
             'then press Connect.'
         )
       );
@@ -395,7 +395,7 @@ const TOOLS = [
 ];
 
 const server = new Server(
-  { name: 'open-figma-mcp', version: '0.2.0' },
+  { name: 'unofficial-figma-mcp', version: '0.2.0' },
   { capabilities: { tools: {} } }
 );
 
@@ -470,7 +470,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req, extra) => {
         if (!plugin || plugin.readyState !== 1) {
           return text({
             connected: false,
-            hint: 'Open the file in Figma, run Plugins > Development > Open Figma MCP, press Connect.',
+            hint: 'Open the file in Figma, run Plugins > Development > Unofficial Figma MCP, press Connect.',
           });
         }
         return text({ connected: true, ...(await call('ping')) });

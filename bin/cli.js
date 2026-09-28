@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// open-figma-mcp CLI.
+// unofficial-figma-mcp CLI.
 //
-//   open-figma-mcp                   start the MCP server (stdio + ws bridge)
-//   open-figma-mcp install-plugin    register the plugin in Figma desktop
-//   open-figma-mcp uninstall-plugin  remove it again
-//   open-figma-mcp plugin-path       print where the plugin files live
+//   unofficial-figma-mcp                   start the MCP server (stdio + ws bridge)
+//   unofficial-figma-mcp install-plugin    register the plugin in Figma desktop
+//   unofficial-figma-mcp uninstall-plugin  remove it again
+//   unofficial-figma-mcp plugin-path       print where the plugin files live
 
 import { execFileSync, spawn } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -12,11 +12,15 @@ import { homedir, platform } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const PLUGIN_ID = 'open-figma-mcp-local';
+const PLUGIN_ID = 'unofficial-figma-mcp-local';
+// Earlier releases shipped as open-figma-mcp; clean those up so Figma does not
+// list the plugin twice.
+const LEGACY_PLUGIN_IDS = ['open-figma-mcp-local'];
+const LEGACY_HOME_DIR = join(homedir(), '.open-figma-mcp');
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC_PLUGIN_DIR = join(ROOT, 'plugin');
-const HOME_DIR = join(homedir(), '.open-figma-mcp');
-const PLUGIN_DIR = process.env.OPEN_FIGMA_MCP_PLUGIN_DIR || join(HOME_DIR, 'plugin');
+const HOME_DIR = join(homedir(), '.unofficial-figma-mcp');
+const PLUGIN_DIR = process.env.UNOFFICIAL_FIGMA_MCP_PLUGIN_DIR || join(HOME_DIR, 'plugin');
 const PLUGIN_FILES = ['manifest.json', 'code.js', 'ui.html'];
 
 const out = (...a) => console.log(...a);
@@ -88,17 +92,18 @@ function readSettings(path) {
 }
 
 function writeSettings(path, data) {
-  const backup = path + '.bak-open-figma-mcp';
+  const backup = path + '.bak-unofficial-figma-mcp';
   cpSync(path, backup);
   writeFileSync(path, JSON.stringify(data));
   out(`Backup written to ${backup}`);
 }
 
-// Drop every entry belonging to our plugin: the manifest row plus any
-// code/ui rows that point back at it.
+// Drop every entry belonging to our plugin (current or legacy id): the
+// manifest row plus any code/ui rows that point back at it.
 function stripPlugin(entries) {
+  const ids = new Set([PLUGIN_ID, ...LEGACY_PLUGIN_IDS]);
   const manifestIds = new Set(
-    entries.filter((e) => e.lastKnownPluginId === PLUGIN_ID).map((e) => e.id),
+    entries.filter((e) => ids.has(e.lastKnownPluginId)).map((e) => e.id),
   );
   return entries.filter(
     (e) => !manifestIds.has(e.id) && !manifestIds.has(e.fileMetadata?.manifestFileId),
@@ -160,11 +165,15 @@ async function installPlugin(flags) {
   writeSettings(path, settings);
 
   out(`Registered "${manifest.name}" in Figma → Plugins → Development.`);
+  if (existsSync(LEGACY_HOME_DIR) && !process.env.UNOFFICIAL_FIGMA_MCP_PLUGIN_DIR) {
+    rmSync(LEGACY_HOME_DIR, { recursive: true, force: true });
+    out(`Removed the old Open Figma MCP plugin at ${LEGACY_HOME_DIR}`);
+  }
   if (wasRunning && !flags.noRelaunch) launchFigma();
   out('');
   out('Next: add the MCP server to your client, e.g.');
-  out('  claude mcp add open-figma-mcp --scope user -- open-figma-mcp');
-  out('  cmd mcp add --scope user open-figma-mcp -- open-figma-mcp');
+  out('  claude mcp add unofficial-figma-mcp --scope user -- unofficial-figma-mcp');
+  out('  cmd mcp add --scope user unofficial-figma-mcp -- unofficial-figma-mcp');
 }
 
 async function uninstallPlugin(flags) {
@@ -190,12 +199,12 @@ async function uninstallPlugin(flags) {
 }
 
 function usage() {
-  out(`open-figma-mcp
+  out(`unofficial-figma-mcp
 
-  open-figma-mcp                   start the MCP server (used by your MCP client)
-  open-figma-mcp install-plugin    copy the plugin to ~/.open-figma-mcp and register it in Figma desktop
-  open-figma-mcp uninstall-plugin  unregister and delete it
-  open-figma-mcp plugin-path       print the plugin directory
+  unofficial-figma-mcp                   start the MCP server (used by your MCP client)
+  unofficial-figma-mcp install-plugin    copy the plugin to ~/.unofficial-figma-mcp and register it in Figma desktop
+  unofficial-figma-mcp uninstall-plugin  unregister and delete it
+  unofficial-figma-mcp plugin-path       print the plugin directory
 
 Flags for install/uninstall:
   --no-quit       do not quit Figma automatically (you must close it first)

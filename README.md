@@ -1,4 +1,8 @@
-# Open Figma MCP
+# Unofficial Figma MCP
+
+> Not affiliated with, endorsed by, or sponsored by Figma, Inc. "Figma" is a
+> trademark of Figma, Inc., used here only to describe what this tool works with.
+> Previously named **Open Figma MCP**.
 
 A self-hosted replacement for Figma's official MCP server. It talks to Figma
 through a local development plugin instead of Figma's cloud API, so the Starter
@@ -20,16 +24,16 @@ the UI holds the socket, the main thread does the work, `postMessage` joins them
 ## Quick start
 
 > **New to Terminal or MCP?** Follow the visual, step-by-step guide for
-> designers at [pradityaaldi.github.io/open-figma-mcp](https://pradityaaldi.github.io/open-figma-mcp/).
+> designers at [pradityaaldi.github.io/unofficial-figma-mcp](https://pradityaaldi.github.io/unofficial-figma-mcp/).
 
 ```bash
 # Install the server and register the plugin in Figma desktop
-curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash
+curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash
 ```
 
 The installer prints the exact MCP configuration for your machine. Add it to
 your client, then open a Figma file and run
-**Plugins → Development → Open Figma MCP**. Call `figma_status` from your MCP
+**Plugins → Development → Unofficial Figma MCP**. Call `figma_status` from your MCP
 client; the dot in the plugin window turns green when the bridge is connected.
 
 Leave the plugin window open — closing it drops the socket. Reopening reconnects.
@@ -38,7 +42,7 @@ Running the install command again updates to the latest GitHub release. To
 remove both the installed command and the development plugin:
 
 ```bash
-curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash -s -- --uninstall
+curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash -s -- --uninstall
 ```
 
 Install a specific tag with `--ref v0.1.0`, or add `--no-plugin` when you only
@@ -49,19 +53,19 @@ runs the test suite and creates the GitHub Release consumed by the installer.
 
 Requirements: macOS or Linux, Node.js 20 or newer, `curl`, and `npm`. The
 installer writes only to user-owned directories (`~/.local` and
-`~/.open-figma-mcp`) and does not need `sudo`.
+`~/.unofficial-figma-mcp`) and does not need `sudo`.
 
 ### What `install-plugin` does
 
 Figma desktop keeps its development plugins in a local `settings.json`
 (`~/Library/Application Support/Figma/` on macOS, `%APPDATA%\Figma\` on
-Windows). The command copies the plugin to `~/.open-figma-mcp/plugin/`, quits
-Figma, adds the plugin to that file, writes a `.bak-open-figma-mcp` backup next
+Windows). The command copies the plugin to `~/.unofficial-figma-mcp/plugin/`, quits
+Figma, adds the plugin to that file, writes a `.bak-unofficial-figma-mcp` backup next
 to it, and relaunches Figma. The plugin then shows up under
 **Plugins → Development** without the manual import step.
 
 Flags: `--no-quit` (you close Figma yourself), `--no-relaunch`.
-`open-figma-mcp uninstall-plugin` reverses it.
+`unofficial-figma-mcp uninstall-plugin` reverses it.
 
 If the settings file cannot be found or Figma will not quit, the command falls
 back to printing the manifest path so you can use
@@ -76,10 +80,10 @@ project:
 
 ```bash
 # Claude Code
-claude mcp add --scope user open-figma-mcp -- ~/.local/bin/open-figma-mcp
+claude mcp add --scope user unofficial-figma-mcp -- ~/.local/bin/unofficial-figma-mcp
 
 # Command Code
-cmd mcp add --scope user open-figma-mcp -- ~/.local/bin/open-figma-mcp
+cmd mcp add --scope user unofficial-figma-mcp -- ~/.local/bin/unofficial-figma-mcp
 ```
 
 Inside a session, `/mcp` shows whether the server is connected. Both agents can
@@ -93,8 +97,8 @@ Any client that speaks stdio MCP works. Cursor / Windsurf / Claude Desktop:
 ```json
 {
   "mcpServers": {
-    "open-figma-mcp": {
-      "command": "/Users/YOU/.local/bin/open-figma-mcp"
+    "unofficial-figma-mcp": {
+      "command": "/Users/YOU/.local/bin/unofficial-figma-mcp"
     }
   }
 }

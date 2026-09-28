@@ -1,4 +1,4 @@
-// Open Figma MCP — Figma plugin main thread.
+// Unofficial Figma MCP — Figma plugin main thread.
 // Owns the `figma` global. Receives commands from ui.html (which holds the
 // WebSocket, since the main thread has no network access) and posts results back.
 

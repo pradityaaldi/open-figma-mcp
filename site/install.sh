@@ -2,11 +2,14 @@
 
 set -Eeuo pipefail
 
-REPOSITORY="pradityaaldi/open-figma-mcp"
-APP_ROOT="${OPEN_FIGMA_MCP_HOME:-$HOME/.local/share/open-figma-mcp}"
-BIN_DIR="${OPEN_FIGMA_MCP_BIN_DIR:-$HOME/.local/bin}"
-BIN_PATH="$BIN_DIR/open-figma-mcp"
-REQUESTED_REF="${OPEN_FIGMA_MCP_REF:-latest}"
+REPOSITORY="pradityaaldi/unofficial-figma-mcp"
+APP_ROOT="${UNOFFICIAL_FIGMA_MCP_HOME:-$HOME/.local/share/unofficial-figma-mcp}"
+BIN_DIR="${UNOFFICIAL_FIGMA_MCP_BIN_DIR:-$HOME/.local/bin}"
+BIN_PATH="$BIN_DIR/unofficial-figma-mcp"
+REQUESTED_REF="${UNOFFICIAL_FIGMA_MCP_REF:-latest}"
+# Installs from before the rename to unofficial-figma-mcp.
+LEGACY_APP_ROOT="$HOME/.local/share/open-figma-mcp"
+LEGACY_BIN_PATH="$BIN_DIR/open-figma-mcp"
 INSTALL_PLUGIN=true
 UNINSTALL=false
 
@@ -29,7 +32,7 @@ fail() {
 
 usage() {
   cat <<'EOF'
-Open Figma MCP installer
+Unofficial Figma MCP installer
 
 Usage:
   install.sh                         install or update to the latest release
@@ -38,9 +41,9 @@ Usage:
   install.sh --uninstall             remove the app and Figma plugin
 
 Environment:
-  OPEN_FIGMA_MCP_HOME                app directory (default: ~/.local/share/open-figma-mcp)
-  OPEN_FIGMA_MCP_BIN_DIR             command directory (default: ~/.local/bin)
-  OPEN_FIGMA_MCP_REF                 release tag or branch (default: latest)
+  UNOFFICIAL_FIGMA_MCP_HOME                app directory (default: ~/.local/share/unofficial-figma-mcp)
+  UNOFFICIAL_FIGMA_MCP_BIN_DIR             command directory (default: ~/.local/bin)
+  UNOFFICIAL_FIGMA_MCP_REF                 release tag or branch (default: latest)
 EOF
 }
 
@@ -83,7 +86,8 @@ uninstall() {
 
   rm -f -- "$BIN_PATH"
   rm -rf -- "$APP_ROOT"
-  success "Open Figma MCP was removed."
+  if [[ -L "$LEGACY_BIN_PATH" ]]; then rm -f -- "$LEGACY_BIN_PATH"; fi
+  success "Unofficial Figma MCP was removed."
 }
 
 if [[ "$UNINSTALL" == true ]]; then
@@ -121,14 +125,14 @@ elif [[ "$REF" == "main" ]]; then
 fi
 
 SAFE_REF="${REF//[^A-Za-z0-9._-]/-}"
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/open-figma-mcp.XXXXXX")"
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/unofficial-figma-mcp.XXXXXX")"
 trap 'rm -rf -- "$TMP_DIR"' EXIT
 
 ARCHIVE="$TMP_DIR/source.tar.gz"
 SOURCE_DIR="$TMP_DIR/source"
 ARCHIVE_URL="https://codeload.github.com/$REPOSITORY/tar.gz/refs/$REF_KIND/$REF"
 
-info "Downloading Open Figma MCP ($REF)…"
+info "Downloading Unofficial Figma MCP ($REF)…"
 curl -fL --retry 3 --connect-timeout 15 "$ARCHIVE_URL" -o "$ARCHIVE"
 mkdir -p "$SOURCE_DIR"
 tar -xzf "$ARCHIVE" -C "$SOURCE_DIR" --strip-components=1
@@ -149,12 +153,23 @@ fi
 ln -sfn "$RELEASE_DIR" "$APP_ROOT/current"
 ln -sfn "$APP_ROOT/current/bin/cli.js" "$BIN_PATH"
 
+# Migrate an Open Figma MCP install: keep the old command name working for
+# existing MCP client configs, and drop the old app directory.
+if [[ -L "$LEGACY_BIN_PATH" || -d "$LEGACY_APP_ROOT" ]]; then
+  info "Migrating from Open Figma MCP…"
+  if [[ -L "$LEGACY_BIN_PATH" ]]; then
+    ln -sfn "$APP_ROOT/current/bin/cli.js" "$LEGACY_BIN_PATH"
+  fi
+  rm -rf -- "$LEGACY_APP_ROOT"
+  warn "The command is now $BIN_PATH. $LEGACY_BIN_PATH still works, but update your MCP config when convenient."
+fi
+
 if [[ "$INSTALL_PLUGIN" == true ]]; then
   info "Installing the Figma development plugin…"
   "$BIN_PATH" install-plugin
 fi
 
-success "Open Figma MCP is installed."
+success "Unofficial Figma MCP is installed."
 printf '\nCommand: %s\n' "$BIN_PATH"
 
 case ":$PATH:" in
@@ -170,19 +185,19 @@ cat <<EOF
 MCP client configuration:
 {
   "mcpServers": {
-    "open-figma-mcp": {
+    "unofficial-figma-mcp": {
       "command": "$BIN_PATH"
     }
   }
 }
 
 Terminal agents (one command each):
-  Claude Code:  claude mcp add --scope user open-figma-mcp -- "$BIN_PATH"
-  Command Code: cmd mcp add --scope user open-figma-mcp -- "$BIN_PATH"
+  Claude Code:  claude mcp add --scope user unofficial-figma-mcp -- "$BIN_PATH"
+  Command Code: cmd mcp add --scope user unofficial-figma-mcp -- "$BIN_PATH"
 
 Open a Figma file, then run:
-Plugins → Development → Open Figma MCP
+Plugins → Development → Unofficial Figma MCP
 
 Update:    run the install command again
-Uninstall: curl -fsSL https://pradityaaldi.github.io/open-figma-mcp/install.sh | bash -s -- --uninstall
+Uninstall: curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash -s -- --uninstall
 EOF
