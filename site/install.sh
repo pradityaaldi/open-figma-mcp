@@ -289,3 +289,39 @@ Plugins → Development → Unofficial Figma MCP
 Update:    run the install command again
 Uninstall: curl -fsSL https://pradityaaldi.github.io/unofficial-figma-mcp/install.sh | bash -s -- --uninstall
 EOF
+
+# Finish with a banner big enough to notice. Block letters need UTF-8;
+# fall back to plain ASCII letters elsewhere.
+case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
+  *UTF-8*|*utf8*|*UTF8*|*utf-8*) BIG_FONT=true ;;
+  *) BIG_FONT=false ;;
+esac
+printf '\n\033[1;32m'
+if [[ "$BIG_FONT" == true ]]; then
+  cat <<'ART'
+███████╗██╗   ██╗ ██████╗ ██████╗███████╗███████╗███████╗
+██╔════╝██║   ██║██╔════╝██╔════╝██╔════╝██╔════╝██╔════╝
+███████╗██║   ██║██║     ██║     █████╗  ███████╗███████╗
+╚════██║██║   ██║██║     ██║     ██╔══╝  ╚════██║╚════██║
+███████║╚██████╔╝╚██████╗╚██████╗███████╗███████║███████║
+╚══════╝ ╚═════╝  ╚═════╝ ╚═════╝╚══════╝╚══════╝╚══════╝
+ART
+else
+  cat <<'ART'
+  ____  _   _  ____ ____ _____ ____ ____
+ / ___|| | | |/ ___/ ___| ____/ ___/ ___|
+ \___ \| | | | |  | |   |  _| \___ \___ \
+  ___) | |_| | |__| |___| |___ ___) |__) |
+ |____/ \___/ \____\____|_____|____/____/
+ART
+fi
+printf '\033[0;1m'
+cat <<'ART'
+  ____  _____    _    ______   __  _____ ___     ____  ___
+ |  _ \| ____|  / \  |  _ \ \ / / |_   _/ _ \   / ___|/ _ \
+ | |_) |  _|   / _ \ | | | \ V /    | || | | | | |  _| | | |
+ |  _ <| |___ / ___ \| |_| || |     | || |_| | | |_| | |_| |
+ |_| \_\_____/_/   \_\____/ |_|     |_| \___/   \____|\___/
+ART
+printf '\033[0m\n'
+printf 'Next: connect your AI app. Step by step: https://pradityaaldi.github.io/unofficial-figma-mcp/#setup\n'
