@@ -421,6 +421,7 @@
           <a href="#setup"><span data-l="en">Setup</span><span data-l="id">Pemasangan</span></a>
           <a href="#compare"><span data-l="en">vs Figma's MCP</span><span data-l="id">vs MCP Figma</span></a>
           <a href="#help"><span data-l="en">Help</span><span data-l="id">Bantuan</span></a>
+          <a href="changelog.html">Changelog</a>
           <a href="https://github.com/pradityaaldi/unofficial-figma-mcp">GitHub</a>
         </nav>
         <div class="lang" role="group" aria-label="Language">
@@ -747,6 +748,8 @@
             <div class="cmd prompt"><code data-l="en">Rename every layer in the selected frame so the names describe what they are.</code><code data-l="id">Ganti nama semua layer di frame yang dipilih supaya sesuai isinya.</code><button class="copy" type="button" data-copy>Copy</button></div>
             <div class="cmd prompt"><code data-l="en">Build a pricing section with three plans using auto layout.</code><code data-l="id">Buat section pricing dengan tiga paket memakai auto layout.</code><button class="copy" type="button" data-copy>Copy</button></div>
             <div class="cmd prompt"><code data-l="en">List all pages in this file and switch to the one called “Components”.</code><code data-l="id">Tampilkan semua halaman di file ini lalu pindah ke halaman “Components”.</code><button class="copy" type="button" data-copy>Copy</button></div>
+            <div class="cmd prompt"><code data-l="en">Put the photo ~/Desktop/hero.jpg into the selected frame as its cover image.</code><code data-l="id">Masukkan foto ~/Desktop/hero.jpg ke frame yang dipilih sebagai gambar cover.</code><button class="copy" type="button" data-copy>Copy</button></div>
+            <div class="cmd prompt"><code data-l="en">Build a team section with three cards, using the photos in ~/Desktop/team.</code><code data-l="id">Buat section tim dengan tiga kartu, memakai foto-foto di ~/Desktop/team.</code><button class="copy" type="button" data-copy>Copy</button></div>
           </div>
         </div>
       </section>
@@ -757,6 +760,7 @@
           <dl class="why-rows">
             <div><dt data-l="en">Watch it build</dt><dt data-l="id">Lihat prosesnya</dt><dd data-l="en">Layouts appear on your canvas one layer at a time, like the login card at the top of this page, so you can see what the AI is doing and stop it early.</dd><dd data-l="id">Layout muncul di canvas satu lapis demi satu, seperti kartu login di atas halaman ini, jadi Anda bisa melihat apa yang dikerjakan AI dan menghentikannya lebih awal.</dd></div>
             <div><dt data-l="en">No quota, no API key</dt><dt data-l="id">Tanpa kuota, tanpa API key</dt><dd data-l="en">It works through a plugin in your own Figma app, not Figma's cloud API, so Figma's MCP rate limits don't apply and there's no access token to set up. <a href="#compare">See the comparison</a>.</dd><dd data-l="id">Bekerja lewat plugin di aplikasi Figma Anda sendiri, bukan API cloud Figma, jadi limit MCP Figma tidak berlaku dan tidak ada access token yang perlu disiapkan. <a href="#compare">Lihat perbandingan</a>.</dd></div>
+            <div><dt data-l="en">Your images, too</dt><dt data-l="id">Gambar Anda juga</dt><dd data-l="en">Point it at a photo or logo on your computer or a link, and it lands on the canvas as a normal image layer you can crop and resize. <a href="changelog.html">New in the next release</a>.</dd><dd data-l="id">Tunjuk foto atau logo di komputer Anda atau sebuah link, dan gambar masuk ke canvas sebagai layer gambar biasa yang bisa di-crop dan diubah ukurannya. <a href="changelog.html">Baru di rilis berikutnya</a>.</dd></div>
             <div><dt data-l="en">Stays on your computer</dt><dt data-l="id">Tetap di komputer Anda</dt><dd data-l="en">The server and plugin run locally. Your design data only goes to the AI app you already chose.</dd><dd data-l="id">Server dan plugin berjalan lokal. Data desain hanya dikirim ke aplikasi AI yang memang Anda pilih.</dd></div>
             <div><dt data-l="en">Your favourite AI app</dt><dt data-l="id">Aplikasi AI favorit Anda</dt><dd data-l="en">Claude Desktop, Claude Code, Command Code, Cursor or any MCP app. Several can share one Figma connection.</dd><dd data-l="id">Claude Desktop, Claude Code, Command Code, Cursor, atau aplikasi MCP lain. Beberapa bisa berbagi satu koneksi Figma.</dd></div>
           </dl>
@@ -825,6 +829,7 @@
               <li><svg aria-hidden="true"><use href="#i-tip"/></svg><span data-l="en"><strong>One file at a time:</strong> the file where you ran the plugin.</span><span data-l="id"><strong>Satu file sekaligus:</strong> file tempat plugin dijalankan.</span></li>
               <li><svg aria-hidden="true"><use href="#i-tip"/></svg><span data-l="en"><strong>Keep the plugin running.</strong> Closing the file or Figma disconnects it; run it again to reconnect.</span><span data-l="id"><strong>Biarkan plugin berjalan.</strong> Menutup file atau Figma memutus koneksi; jalankan lagi untuk menyambung.</span></li>
               <li><svg aria-hidden="true"><use href="#i-tip"/></svg><span data-l="en"><strong>It shows as “Development”</strong> in Figma, because it's installed from your computer rather than Figma Community.</span><span data-l="id"><strong>Tampil sebagai “Development”</strong> di Figma, karena dipasang dari komputer Anda, bukan Figma Community.</span></li>
+              <li><svg aria-hidden="true"><use href="#i-tip"/></svg><span data-l="en"><strong>Images: PNG, JPEG, GIF and SVG.</strong> Figma can't import WebP, and photos can be at most 4096 px on each side.</span><span data-l="id"><strong>Gambar: PNG, JPEG, GIF, dan SVG.</strong> Figma tidak bisa mengimpor WebP, dan foto maksimal 4096 px di tiap sisi.</span></li>
               <li><svg aria-hidden="true"><use href="#i-warn"/></svg><span data-l="en"><strong>Unofficial.</strong> Not affiliated with, endorsed by or sponsored by Figma, Inc.</span><span data-l="id"><strong>Tidak resmi.</strong> Tidak berafiliasi, didukung, atau disponsori oleh Figma, Inc.</span></li>
             </ul>
           </div>
@@ -877,7 +882,7 @@
       <div class="wrap">
         <span data-l="en">Unofficial Figma MCP · MIT license · Not affiliated with, endorsed by or sponsored by Figma, Inc. “Figma” is a trademark of Figma, Inc.</span>
         <span data-l="id">Unofficial Figma MCP · Lisensi MIT · Tidak berafiliasi, didukung, atau disponsori oleh Figma, Inc. “Figma” adalah merek dagang Figma, Inc.</span>
-        <a href="https://github.com/pradityaaldi/unofficial-figma-mcp">GitHub</a>
+        <span><a href="changelog.html">Changelog</a> · <a href="https://github.com/pradityaaldi/unofficial-figma-mcp">GitHub</a></span>
       </div>
     </footer>
 

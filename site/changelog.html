@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="What changed in each release of Unofficial Figma MCP, the local MCP server and Figma plugin that lets your AI design in Figma.">
+    <meta property="og:title" content="Changelog — Unofficial Figma MCP">
+    <meta property="og:description" content="What changed in each release of Unofficial Figma MCP.">
+    <meta name="theme-color" content="#F5F0E7">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%23171513'/%3E%3Cg transform='rotate(-5 64 64)'%3E%3Crect x='25' y='25' width='36' height='36' rx='10' fill='%23F5F0E7'/%3E%3Ccircle cx='85' cy='43' r='18' fill='%237657FF'/%3E%3Ccircle cx='43' cy='85' r='18' fill='%23FF6B55'/%3E%3Crect x='69' y='69' width='32' height='32' rx='9' fill='%23C8FF4A' fill-opacity='0.16' stroke='%23C8FF4A' stroke-width='4' stroke-dasharray='7 5.5'/%3E%3C/g%3E%3Cpath d='M89 86 L89 112 L96 105 L101 115.5 L106 113 L101 102.8 L110.8 102.8 Z' fill='%23FFFFFF' stroke='%23171513' stroke-width='3.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <title>Changelog — Unofficial Figma MCP</title>
+    <style>
+      :root {
+        --paper: #F5F0E7; --paper-deep: #ECE4D5; --sheet: #FFFBF3; --ink: #171513; --ink-soft: #3A3631;
+        --muted: #655F56; --line: #D8D0C4; --lime: #C8FF4A; --lime-wash: #E6F4CC; --violet: #7657FF;
+        --coral: #FF6B55; --coral-wash: #FFE3DD; --green: #1B7F45;
+        --display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+        --body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        --ease: cubic-bezier(.16,1,.3,1);
+        color-scheme: light;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; scroll-padding-top: 84px; }
+      body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.6 var(--body); overflow-x: hidden; }
+      ::selection { background: var(--lime); color: var(--ink); }
+      :focus-visible { outline: 3px solid var(--violet); outline-offset: 3px; border-radius: 6px; }
+      a { color: inherit; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+      a:hover { text-decoration-thickness: 2px; }
+      h1, h2 { font-family: var(--display); line-height: 1.05; margin: 0; text-wrap: balance; }
+      p { margin: 0; }
+      code { font-family: var(--mono); font-size: .86em; background: var(--paper-deep); padding: 1px 5px; border-radius: 5px; overflow-wrap: anywhere; }
+      html[lang="en"] [data-l="id"], html[lang="id"] [data-l="en"] { display: none !important; }
+      .wrap { width: min(100% - 32px, 1180px); margin-inline: auto; }
+
+      /* Navigation (same as the guide) */
+      .nav { position: sticky; top: 0; z-index: 30; background: rgba(245,240,231,.88); backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--line); }
+      .nav-in { display: flex; align-items: center; gap: 20px; height: 68px; }
+      .brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: 1.05rem; letter-spacing: -.02em; text-decoration: none; }
+      .brand svg { width: 32px; height: 32px; flex: none; }
+      .nav-links { display: flex; gap: 4px; margin-left: auto; }
+      .nav-links a { padding: 8px 12px; border-radius: 999px; font-size: .92rem; font-weight: 600; text-decoration: none; }
+      .nav-links a:hover { background: var(--paper-deep); }
+      .nav-links a[aria-current="page"] { background: var(--ink); color: var(--paper); }
+      .lang { display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--sheet); }
+      .lang button { border: 0; background: none; font: 700 .78rem/1 var(--body); letter-spacing: .04em; padding: 7px 10px; border-radius: 999px; cursor: pointer; color: var(--muted); }
+      .lang button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+      /* Header */
+      .head { padding: clamp(48px, 7vw, 88px) 0 clamp(32px, 4vw, 48px); }
+      .head h1 { font-size: clamp(2.6rem, 4.5vw, 4.1rem); font-weight: 800; letter-spacing: -.04em; }
+      .head h1 em { font-style: normal; background: linear-gradient(transparent 62%, var(--lime) 62% 92%, transparent 92%); padding: 0 .06em; }
+      .lede { margin-top: 18px; font-size: 1.14rem; color: var(--ink-soft); max-width: 38em; }
+      .head-links { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 18px; font-weight: 700; }
+
+      /* Releases */
+      .releases { border-top: 2px solid var(--ink); margin-bottom: clamp(64px, 9vw, 112px); }
+      .release { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 12px 40px; padding: 36px 0; border-bottom: 1px solid var(--line); }
+      .rel-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+      .rel-meta h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); font-weight: 800; letter-spacing: -.02em; }
+      .rel-meta time, .rel-meta .when { font-size: .92rem; color: var(--muted); }
+      .rel-meta a { font-size: .88rem; font-weight: 600; color: var(--muted); }
+      .badge { display: inline-block; padding: 5px 10px; border-radius: 999px; font: 700 .74rem/1 var(--body); letter-spacing: .04em; text-transform: uppercase; background: var(--ink); color: var(--paper); }
+      .badge.next { background: var(--lime); color: var(--ink); }
+      .rel-body h3 { margin: 0; font: 700 1.35rem/1.15 var(--display); letter-spacing: -.02em; }
+      .rel-body > p { margin-top: 8px; color: var(--ink-soft); max-width: 44em; }
+      .rel-body h3 + ul, .rel-body p + ul { margin-top: 18px; }
+      .changes { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+      .changes li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 14px; align-items: baseline; color: var(--ink-soft); max-width: 52em; }
+      .kind { justify-self: start; padding: 4px 9px; border-radius: 6px; font: 700 .72rem/1.2 var(--body); letter-spacing: .03em; text-transform: uppercase; background: var(--paper-deep); color: var(--ink); }
+      .kind.new { background: var(--lime-wash); }
+      .kind.fix { background: var(--coral-wash); }
+      .note { margin-top: 20px; padding: 12px 14px; border-radius: 12px; background: var(--sheet); border: 1px solid var(--line); font-size: .94rem; color: var(--ink-soft); max-width: 52em; }
+      .note strong { color: var(--ink); }
+      .release.latest { position: relative; }
+
+      footer { padding: 0 0 56px; font-size: .88rem; color: var(--muted); }
+      footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 32px; border-top: 1px solid var(--line); padding-top: 24px; }
+
+      @media (max-width: 820px) {
+        .release { grid-template-columns: 1fr; }
+        .rel-meta { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+      }
+      @media (max-width: 640px) {
+        body { font-size: 16px; }
+        .nav-in { flex-wrap: wrap; height: auto; padding: 12px 0 6px; row-gap: 4px; }
+        .lang { margin-left: auto; }
+        .nav-links { order: 3; width: 100%; margin: 0 -10px; overflow-x: auto; scrollbar-width: none; }
+        .nav-links a { padding: 6px 10px; font-size: .86rem; white-space: nowrap; }
+        .changes li { grid-template-columns: 1fr; gap: 6px; }
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <symbol id="i-mark" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="#171513"/><g transform="rotate(-5 64 64)"><rect x="25" y="25" width="36" height="36" rx="10" fill="#F5F0E7"/><circle cx="85" cy="43" r="18" fill="#7657FF"/><circle cx="43" cy="85" r="18" fill="#FF6B55"/><rect x="69" y="69" width="32" height="32" rx="9" fill="#C8FF4A" fill-opacity=".16" stroke="#C8FF4A" stroke-width="4" stroke-dasharray="7 5.5"/></g><path d="M89 86 L89 112 L96 105 L101 115.5 L106 113 L101 102.8 L110.8 102.8 Z" fill="#FFFFFF" stroke="#171513" stroke-width="3.5" stroke-linejoin="round"/></symbol>
+    </svg>
+
+    <header class="nav">
+      <div class="wrap nav-in">
+        <a class="brand" href="./"><svg aria-hidden="true"><use href="#i-mark"/></svg>Unofficial Figma MCP</a>
+        <nav class="nav-links" aria-label="Pages">
+          <a href="./#setup"><span data-l="en">Setup</span><span data-l="id">Pemasangan</span></a>
+          <a href="./#help"><span data-l="en">Help</span><span data-l="id">Bantuan</span></a>
+          <a href="changelog.html" aria-current="page">Changelog</a>
+          <a href="https://github.com/pradityaaldi/unofficial-figma-mcp">GitHub</a>
+        </nav>
+        <div class="lang" role="group" aria-label="Language">
+          <button type="button" data-lang="en" aria-pressed="true">EN</button>
+          <button type="button" data-lang="id" aria-pressed="false">ID</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="head">
+        <h1><span data-l="en">What's <em>new</em>.</span><span data-l="id">Apa yang <em>baru</em>.</span></h1>
+        <p class="lede" data-l="en">Every release of Unofficial Figma MCP, newest first. To update, run the install line from the guide again: it always installs the latest release.</p>
+        <p class="lede" data-l="id">Setiap rilis Unofficial Figma MCP, dari yang terbaru. Untuk update, jalankan lagi baris install dari panduan: selalu memasang rilis terbaru.</p>
+        <div class="head-links">
+          <a href="./#setup"><span data-l="en">Install or update</span><span data-l="id">Pasang atau update</span></a>
+          <a href="https://github.com/pradityaaldi/unofficial-figma-mcp/releases"><span data-l="en">Releases on GitHub</span><span data-l="id">Rilis di GitHub</span></a>
+        </div>
+      </div>
+
+      <div class="releases">
+        <article class="release latest" aria-labelledby="r-next">
+          <div class="rel-meta">
+            <span class="badge next" data-l="en">Next release</span><span class="badge next" data-l="id">Rilis berikutnya</span>
+            <h2 id="r-next">Upload images</h2>
+            <span class="when" data-l="en">In progress on main</span><span class="when" data-l="id">Sedang disiapkan di main</span>
+          </div>
+          <div class="rel-body">
+            <h3 data-l="en">Put your own photos and graphics into Figma.</h3>
+            <h3 data-l="id">Masukkan foto dan grafik Anda sendiri ke Figma.</h3>
+            <p data-l="en">Ask the AI to place an image from your computer or from a link. It lands on the canvas as a normal image layer you can crop, resize and reuse.</p>
+            <p data-l="id">Minta AI menaruh gambar dari komputer Anda atau dari sebuah link. Gambar masuk ke canvas sebagai layer gambar biasa yang bisa di-crop, diubah ukurannya, dan dipakai ulang.</p>
+            <ul class="changes">
+              <li><span class="kind new">New</span><span data-l="en"><code>figma_upload_image</code> places an image from a file path, an <code>http(s)</code> link, or a data URI. PNG, JPEG and GIF become a new layer at their natural size, or fill a layer you already have. SVG becomes editable vectors.</span><span data-l="id"><code>figma_upload_image</code> menaruh gambar dari path file, link <code>http(s)</code>, atau data URI. PNG, JPEG, dan GIF menjadi layer baru dengan ukuran aslinya, atau mengisi layer yang sudah ada. SVG menjadi vektor yang bisa diedit.</span></li>
+              <li><span class="kind new">New</span><span data-l="en"><code>figma_build</code> layers take an <code>image</code>, with <code>imageScale</code> set to fill, fit, crop or tile, plus a plain <code>IMAGE</code> type. Give one side and the other follows the image's proportions.</span><span data-l="id">Layer di <code>figma_build</code> bisa diberi <code>image</code>, dengan <code>imageScale</code> fill, fit, crop, atau tile, serta tipe <code>IMAGE</code> untuk gambar biasa. Isi satu sisi, sisi lainnya mengikuti proporsi gambar.</span></li>
+              <li><span class="kind">Improved</span><span data-l="en">Cropped images start centred and covering the box, instead of stretched to fit it.</span><span data-l="id">Gambar yang di-crop dimulai di tengah dan menutupi kotak, bukan diregangkan.</span></li>
+              <li><span class="kind">Improved</span><span data-l="en">An SVG given a width or height now scales its artwork, instead of cutting it off at the new frame size.</span><span data-l="id">SVG yang diberi lebar atau tinggi sekarang ikut diperkecil atau diperbesar, bukan terpotong di ukuran frame yang baru.</span></li>
+              <li><span class="kind">Improved</span><span data-l="en">Files Figma can't import, such as WebP, are refused with a clear message. Uploads are capped at 20 MB.</span><span data-l="id">File yang tidak bisa diimpor Figma, misalnya WebP, ditolak dengan pesan yang jelas. Batas upload 20 MB.</span></li>
+            </ul>
+            <p class="note" data-l="en"><strong>Not in the installer yet.</strong> The installer sets up the latest release, so this arrives with the next one. After updating, run the plugin in Figma again and restart your AI app.</p>
+            <p class="note" data-l="id"><strong>Belum ada di installer.</strong> Installer memasang rilis terbaru, jadi fitur ini hadir di rilis berikutnya. Setelah update, jalankan lagi plugin di Figma dan restart aplikasi AI Anda.</p>
+          </div>
+        </article>
+
+        <article class="release" aria-labelledby="r-022">
+          <div class="rel-meta">
+            <span class="badge" data-l="en">Latest release</span><span class="badge" data-l="id">Rilis terbaru</span>
+            <h2 id="r-022">v0.2.2</h2>
+            <time datetime="2026-09-28" data-l="en">28 September 2026</time><time datetime="2026-09-28" data-l="id">28 September 2026</time>
+            <a href="https://github.com/pradityaaldi/unofficial-figma-mcp/releases/tag/v0.2.2">GitHub →</a>
+          </div>
+          <div class="rel-body">
+            <h3 data-l="en">A clearer start for designers.</h3>
+            <h3 data-l="id">Awal yang lebih jelas untuk desainer.</h3>
+            <ul class="changes">
+              <li><span class="kind">Guide</span><span data-l="en">New first step to get Figma Desktop, since plugins only run in the desktop app, not in the browser.</span><span data-l="id">Langkah pertama baru untuk menyiapkan Figma Desktop, karena plugin hanya berjalan di aplikasi desktop, bukan di browser.</span></li>
+              <li><span class="kind">Guide</span><span data-l="en">Explains why no Figma API key or access token is needed: the plugin works inside Figma Desktop, not through Figma's cloud API.</span><span data-l="id">Menjelaskan kenapa tidak perlu API key atau access token Figma: plugin bekerja di dalam Figma Desktop, bukan lewat API cloud Figma.</span></li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="release" aria-labelledby="r-021">
+          <div class="rel-meta">
+            <h2 id="r-021">v0.2.1</h2>
+            <time datetime="2026-09-28">28 September 2026</time>
+            <a href="https://github.com/pradityaaldi/unofficial-figma-mcp/releases/tag/v0.2.1">GitHub →</a>
+          </div>
+          <div class="rel-body">
+            <h3 data-l="en">One line installs everything, Node.js included.</h3>
+            <h3 data-l="id">Satu baris memasang semuanya, termasuk Node.js.</h3>
+            <ul class="changes">
+              <li><span class="kind new">New</span><span data-l="en">No Node.js? The installer downloads the official LTS, checks it, and keeps it inside the app. No admin password, nothing changed system-wide.</span><span data-l="id">Belum ada Node.js? Installer mengunduh versi LTS resmi, memeriksanya, dan menyimpannya di dalam aplikasi. Tanpa password admin, tidak ada yang berubah di sistem.</span></li>
+              <li><span class="kind">Improved</span><span data-l="en">Desktop AI apps that can't see your Terminal's setup can now start the server.</span><span data-l="id">Aplikasi AI desktop yang tidak membaca pengaturan Terminal Anda sekarang bisa menjalankan server.</span></li>
+              <li><span class="kind">Improved</span><span data-l="en">The installer ends with a big SUCCESS / READY TO GO banner.</span><span data-l="id">Installer diakhiri banner besar SUCCESS / READY TO GO.</span></li>
+              <li><span class="kind">Guide</span><span data-l="en">This guide was rebuilt: English and Indonesian, steps that follow the AI app you pick, animated illustrations, and a comparison with Figma's own MCP servers.</span><span data-l="id">Panduan ini dibuat ulang: bahasa Inggris dan Indonesia, langkah yang mengikuti aplikasi AI pilihan Anda, ilustrasi animasi, dan perbandingan dengan MCP server resmi Figma.</span></li>
+              <li><span class="kind new">New</span><span data-l="en">A project icon, shown in the plugin window and as this site's icon.</span><span data-l="id">Ikon project, tampil di jendela plugin dan sebagai ikon situs ini.</span></li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="release" aria-labelledby="r-020">
+          <div class="rel-meta">
+            <h2 id="r-020">v0.2.0</h2>
+            <time datetime="2026-09-28">28 September 2026</time>
+            <a href="https://github.com/pradityaaldi/unofficial-figma-mcp/releases/tag/v0.2.0">GitHub →</a>
+          </div>
+          <div class="rel-body">
+            <h3 data-l="en">Watch the AI build, layer by layer.</h3>
+            <h3 data-l="id">Lihat AI membangun, lapis demi lapis.</h3>
+            <ul class="changes">
+              <li><span class="kind new">New</span><span data-l="en"><code>figma_build</code> turns a short description into layers that appear on your canvas one at a time, with fonts and auto layout handled for the AI.</span><span data-l="id"><code>figma_build</code> mengubah deskripsi singkat menjadi layer yang muncul di canvas satu per satu, dengan font dan auto layout diurus untuk AI.</span></li>
+              <li><span class="kind">Improved</span><span data-l="en">Long builds report progress and no longer time out.</span><span data-l="id">Build yang panjang melaporkan progres dan tidak lagi timeout.</span></li>
+              <li><span class="kind">Improved</span><span data-l="en">Faster replies and reconnects; screenshots are capped at 1600 px on the longest edge.</span><span data-l="id">Balasan dan koneksi ulang lebih cepat; screenshot dibatasi 1600 px di sisi terpanjang.</span></li>
+              <li><span class="kind">Changed</span><span data-l="en">Renamed from Open Figma MCP to Unofficial Figma MCP. Existing installs move over automatically.</span><span data-l="id">Nama berubah dari Open Figma MCP menjadi Unofficial Figma MCP. Instalasi lama pindah otomatis.</span></li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="release" aria-labelledby="r-early">
+          <div class="rel-meta">
+            <h2 id="r-early"><span data-l="en">Early builds</span><span data-l="id">Versi awal</span></h2>
+            <span class="when">3–5 September 2026</span>
+          </div>
+          <div class="rel-body">
+            <h3 data-l="en">The first local Figma MCP.</h3>
+            <h3 data-l="id">MCP Figma lokal yang pertama.</h3>
+            <ul class="changes">
+              <li><span class="kind new">New</span><span data-l="en">A local MCP server and a Figma plugin: run code in the file, take screenshots, read layers, the selection and pages.</span><span data-l="id">MCP server lokal dan plugin Figma: menjalankan kode di file, mengambil screenshot, membaca layer, pilihan, dan halaman.</span></li>
+              <li><span class="kind new">New</span><span data-l="en">The plugin registers itself in Figma Desktop, so there's no manual import.</span><span data-l="id">Plugin mendaftarkan dirinya sendiri di Figma Desktop, jadi tidak perlu impor manual.</span></li>
+              <li><span class="kind new">New</span><span data-l="en">The one-line installer and this guide.</span><span data-l="id">Installer satu baris dan panduan ini.</span></li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <span data-l="en">Unofficial Figma MCP · MIT license · Not affiliated with, endorsed by or sponsored by Figma, Inc. “Figma” is a trademark of Figma, Inc.</span>
+        <span data-l="id">Unofficial Figma MCP · Lisensi MIT · Tidak berafiliasi, didukung, atau disponsori oleh Figma, Inc. “Figma” adalah merek dagang Figma, Inc.</span>
+        <a href="https://github.com/pradityaaldi/unofficial-figma-mcp">GitHub</a>
+      </div>
+    </footer>
+
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const store = {
+          get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+          set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } },
+        };
+        // Same language key as the guide, so the choice carries between pages.
+        const titles = { en: 'Changelog — Unofficial Figma MCP', id: 'Changelog — Unofficial Figma MCP' };
+        const setLang = (lang) => {
+          if (!titles[lang]) lang = 'en';
+          root.lang = lang;
+          document.title = titles[lang];
+          document.querySelectorAll('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+          store.set('ufm-lang', lang);
+        };
+        const param = new URLSearchParams(location.search).get('lang');
+        setLang(param || store.get('ufm-lang') || 'en');
+        document.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang)));
+      })();
+    </script>
+  </body>
+</html>
