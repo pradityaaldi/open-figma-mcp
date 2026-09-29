@@ -516,7 +516,7 @@ const TOOLS = [
 ];
 
 const server = new Server(
-  { name: 'unofficial-figma-mcp', version: '0.2.2' },
+  { name: 'unofficial-figma-mcp', version: '0.3.0' },
   { capabilities: { tools: {} } }
 );
 

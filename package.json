@@ -1,6 +1,6 @@
 {
   "name": "unofficial-figma-mcp",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "private": true,
   "description": "Self-hosted, harness-agnostic Figma MCP server — unlimited tool calls via your own Figma plugin",
   "type": "module",
