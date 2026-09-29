@@ -132,6 +132,7 @@ when run from this directory. `npm start` runs the server directly.
 | --- | --- |
 | `figma_build` | Build a layout from a JSON node tree, live on canvas, one node at a time. |
 | `figma_exec` | Run arbitrary Plugin API JavaScript — edits, queries, anything else. |
+| `figma_upload_image` | Place an image from a local path, URL, or data URI — as a new layer or the fill of an existing one. |
 | `figma_screenshot` | Export a node as PNG (longest edge capped at 1600px), returned inline. |
 | `figma_get_metadata` | Structural outline — ids, names, types, sizes, text. |
 | `figma_get_selection` | What the user has selected right now. |
@@ -163,9 +164,27 @@ gradients (`{"gradient": ["#a", "#b"], "angle": 90}`), or raw Figma paints. The
 full field list is in the tool description the model sees. `stepDelay` (default
 30 ms) sets the pace; `0` builds as fast as possible.
 
+Any node can carry an image: `"image"` takes a local file path, an `https://` URL,
+or a data URI, and `"imageScale"` picks `fill`, `fit`, `crop`, or `tile`. A node
+with an image and no size takes the picture's natural size. `{"type": "IMAGE"}`
+is a plain picture rectangle.
+
 Progress streams back while a build runs. Each node resets the bridge timeout,
 so long builds do not time out, and clients that send a `progressToken` receive
 MCP progress notifications.
+
+### Uploading images with `figma_upload_image`
+
+The Figma plugin sandbox cannot read your disk, so the bridge server loads the
+image — from a path on this machine, an `http(s)` URL, or a data URI — and sends
+the bytes to the plugin. PNG, JPEG, and GIF become an image fill: a new
+rectangle at the image's natural size, or the fill of an existing node when you
+pass `nodeId`. SVG becomes editable vector layers. Figma rejects bitmaps larger
+than 4096 px on either edge, and the bridge caps uploads at 20 MB.
+
+```json
+{"source": "~/Desktop/hero.jpg", "width": 640, "scaleMode": "fill"}
+```
 
 ### Writing `figma_exec` code
 

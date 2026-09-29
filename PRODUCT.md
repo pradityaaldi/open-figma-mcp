@@ -31,7 +31,7 @@ Unofficial Figma MCP is a self-hosted MCP server plus a Figma development plugin
 
 ## Capabilities and Constraints
 
-- Tools: figma_build, figma_exec, figma_screenshot, figma_get_metadata, figma_get_selection, figma_get_pages, figma_set_page, figma_status, figma_toggle_ui.
+- Tools: figma_build, figma_exec, figma_upload_image, figma_screenshot, figma_get_metadata, figma_get_selection, figma_get_pages, figma_set_page, figma_status, figma_toggle_ui.
 - One Figma file at a time (whichever file runs the plugin); the plugin must stay running; Figma Desktop only.
 - Several AI clients can share one plugin connection (the first owns port 3055, others relay).
 - Figma's official MCP server limits (from developers.figma.com/docs/figma-mcp-server/rate-limits-access/): View/Collab seats get up to 20 calls/month on Starter and up to 6/month on paid plans; Dev/Full seats get daily and per-minute caps; limits apply to read tools, some write tools are exempt. State these only with a link to that page.

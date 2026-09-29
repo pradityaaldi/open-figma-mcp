@@ -255,6 +255,122 @@ function toEffects(spec) {
   return effects;
 }
 
+// ---------------------------------------------------------------------- images
+
+// The bridge server loads image files and URLs (the sandbox cannot) and sends
+// PNG/JPEG/GIF bytes as base64.
+const SCALE_MODES = { fill: 'FILL', fit: 'FIT', crop: 'CROP', tile: 'TILE' };
+
+async function createImageFromBase64(base64) {
+  const image = figma.createImage(figma.base64Decode(base64));
+  const size = await image.getSizeAsync();
+  return { image, size };
+}
+
+function imagePaint(image, scaleMode) {
+  const key = String(scaleMode || 'fill').toLowerCase();
+  if (!SCALE_MODES[key]) throw new Error('Bad scale mode: ' + scaleMode + ' (use fill, fit, crop or tile)');
+  return { type: 'IMAGE', imageHash: image.hash, scaleMode: SCALE_MODES[key] };
+}
+
+// CROP with no transform stretches the image to the box. Start it centred and
+// covering, like FILL, so the user gets an undistorted crop to adjust.
+function coverCrop(paint, size, box) {
+  if (paint.scaleMode !== 'CROP') return paint;
+  const imageRatio = size.width / size.height;
+  const boxRatio = box.width / box.height;
+  const sx = imageRatio > boxRatio ? boxRatio / imageRatio : 1;
+  const sy = imageRatio > boxRatio ? 1 : imageRatio / boxRatio;
+  return Object.assign({}, paint, {
+    imageTransform: [
+      [sx, 0, (1 - sx) / 2],
+      [0, sy, (1 - sy) / 2],
+    ],
+  });
+}
+
+// Scale vectors uniformly to fit a requested width and/or height; resize()
+// alone would change the frame box and crop the artwork instead.
+function rescaleToFit(node, width, height) {
+  if (typeof width !== 'number' && typeof height !== 'number') return;
+  const natural = { width: node.width, height: node.height };
+  const target = fitSize(natural, width, height);
+  node.rescale(Math.min(target.width / natural.width, target.height / natural.height));
+}
+
+// Natural size, or the missing edge derived from the aspect ratio.
+function fitSize(size, width, height) {
+  const w = typeof width === 'number' ? width : undefined;
+  const h = typeof height === 'number' ? height : undefined;
+  if (w !== undefined && h !== undefined) return { width: w, height: h };
+  if (w !== undefined) return { width: w, height: Math.round((w * size.height) / size.width) };
+  if (h !== undefined) return { width: Math.round((h * size.width) / size.height), height: h };
+  return { width: size.width, height: size.height };
+}
+
+async function placeImage(p) {
+  const focus = p.focus !== false;
+  let node;
+  let natural;
+  let hash;
+
+  if (p.svg) {
+    if (p.nodeId) throw new Error('An SVG cannot be an image fill; omit nodeId to place it as vectors');
+    node = figma.createNodeFromSvg(p.svg);
+    natural = { width: node.width, height: node.height };
+    rescaleToFit(node, p.width, p.height);
+  } else {
+    const { image, size } = await createImageFromBase64(p.base64);
+    natural = size;
+    hash = image.hash;
+    const paint = imagePaint(image, p.scaleMode);
+    if (p.nodeId) {
+      node = await resolveNode(p.nodeId);
+      if (!('fills' in node)) throw new Error(node.type + ' cannot take an image fill');
+      if ((typeof p.width === 'number' || typeof p.height === 'number') && 'resize' in node) {
+        const target = fitSize({ width: node.width, height: node.height }, p.width, p.height);
+        node.resize(target.width, target.height);
+      }
+    } else {
+      node = figma.createRectangle();
+      const target = fitSize(size, p.width, p.height);
+      node.resize(Math.max(0.01, target.width), Math.max(0.01, target.height));
+    }
+    node.fills = [coverCrop(paint, size, node)];
+  }
+
+  if (p.name) node.name = p.name;
+
+  if (!p.nodeId) {
+    const parent = p.parentId ? await resolveNode(p.parentId) : figma.currentPage;
+    if (!('appendChild' in parent)) throw new Error(parent.type + ' cannot have children');
+    const spot = parent.type === 'PAGE' && p.x === undefined && p.y === undefined ? nextFreeX(parent, 120) : null;
+    parent.appendChild(node);
+    if (spot) {
+      node.x = spot.x;
+      node.y = spot.y;
+    } else {
+      if (p.x !== undefined) node.x = p.x;
+      if (p.y !== undefined) node.y = p.y;
+    }
+  }
+
+  if (focus) {
+    figma.viewport.scrollAndZoomIntoView([node]);
+    try {
+      figma.currentPage.selection = [node];
+    } catch (e) {
+      // node lives on another page; leave the selection alone
+    }
+  }
+
+  const out = safeValue(node, 0);
+  if (hash) out.imageHash = hash;
+  out.naturalWidth = Math.round(natural.width);
+  out.naturalHeight = Math.round(natural.height);
+  return out;
+}
+
 const WEIGHT_STYLES = {
   100: 'Thin', 200: 'Extra Light', 300: 'Light', 400: 'Regular', 500: 'Medium',
   600: 'Semi Bold', 700: 'Bold', 800: 'Extra Bold', 900: 'Black',
@@ -390,6 +506,7 @@ async function createNode(spec) {
       return figma.createText();
     case 'RECTANGLE':
     case 'RECT':
+    case 'IMAGE':
       return figma.createRectangle();
     case 'ELLIPSE':
       return figma.createEllipse();
@@ -511,13 +628,32 @@ async function build(p, requestId) {
     const label = path + (spec.name || fallback);
     let node;
     try {
+      // An image with a missing edge takes its size from the picture itself.
+      let paint = null;
+      let imageSize = null;
+      if (spec.imageData) {
+        const { image, size } = await createImageFromBase64(spec.imageData);
+        paint = imagePaint(image, spec.imageScale);
+        imageSize = size;
+        if (spec.width === undefined || spec.height === undefined) {
+          const fit = fitSize(size, spec.width, spec.height);
+          spec = {
+            ...spec,
+            width: spec.width === undefined ? fit.width : spec.width,
+            height: spec.height === undefined ? fit.height : spec.height,
+          };
+        }
+      }
       node = await createNode(spec);
       const isRoot = depth === 0;
       const parentIsAutoLayout = 'layoutMode' in into && into.layoutMode !== 'NONE';
       if (node.type === 'TEXT') applyText(node, spec, fonts);
       applyStyle(node, spec, isRoot);
+      // The image sits on top of an explicit `fill`, and replaces the default white.
+      if (paint) node.fills = spec.fill !== undefined ? [...node.fills, paint] : [paint];
       applyLayout(node, spec);
 
+      if (spec.svg) rescaleToFit(node, spec.width, spec.height);
       // Size before appending so a fixed-size frame never flashes at 100x100.
       if (node.type !== 'TEXT' && node.type !== 'LINE' && (typeof spec.width === 'number' || typeof spec.height === 'number')) {
         node.resize(
@@ -534,6 +670,10 @@ async function build(p, requestId) {
       if (spec.position === 'absolute' && parentIsAutoLayout) node.layoutPositioning = 'ABSOLUTE';
       const flowChild = parentIsAutoLayout && node.layoutPositioning !== 'ABSOLUTE';
       applySize(node, spec, flowChild);
+      // A crop is framed against the final box, which a "fill" size only settles here.
+      if (paint && paint.scaleMode === 'CROP') {
+        node.fills = [...node.fills.slice(0, -1), coverCrop(paint, imageSize, node)];
+      }
 
       if (spot) {
         node.x = spot.x;
@@ -629,6 +769,10 @@ const commands = {
     if (!sel.length) return { count: 0, nodes: [] };
     const o = buildHelpers().outline;
     return { count: sel.length, nodes: sel.map((n) => o(n, 1)) };
+  },
+
+  async place_image(p) {
+    return placeImage(p);
   },
 
   async screenshot(p) {

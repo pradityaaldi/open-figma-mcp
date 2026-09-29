@@ -15,6 +15,9 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { WebSocket, WebSocketServer } from 'ws';
+import { readFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { resolve as resolvePath } from 'node:path';
 
 const PORT = Number(process.env.BRIDGE_PORT || 3055);
 const TIMEOUT_MS = Number(process.env.BRIDGE_TIMEOUT || 30000);
@@ -213,6 +216,86 @@ const text = (v) => ({
   content: [{ type: 'text', text: typeof v === 'string' ? v : JSON.stringify(v) }],
 });
 
+// ------------------------------------------------------------------- images
+
+// The plugin sandbox cannot read local files, and fetching from it would need
+// every image host in the manifest's allowedDomains. So images are loaded here,
+// on the user's machine, and cross the bridge as base64.
+const MAX_IMAGE_BYTES = 20 * 1024 * 1024;
+
+async function loadImageSource(source) {
+  if (typeof source !== 'string' || !source.trim()) throw new Error('Image source must be a non-empty string');
+  const src = source.trim();
+  let bytes;
+
+  if (src.startsWith('data:')) {
+    const m = /^data:([^;,]*)(;base64)?,(.*)$/s.exec(src);
+    if (!m) throw new Error('Malformed data URI');
+    bytes = m[2] ? Buffer.from(m[3], 'base64') : Buffer.from(decodeURIComponent(m[3]), 'utf8');
+  } else if (/^https?:\/\//i.test(src)) {
+    const res = await fetch(src, { signal: AbortSignal.timeout(TIMEOUT_MS) });
+    if (!res.ok) throw new Error(`Fetching ${src} failed: HTTP ${res.status}`);
+    bytes = Buffer.from(await res.arrayBuffer());
+  } else {
+    const path = resolvePath(src.replace(/^~(?=$|\/)/, homedir()));
+    try {
+      bytes = await readFile(path);
+    } catch (e) {
+      throw new Error(`Cannot read image file ${path}: ${e.code || e.message}`);
+    }
+  }
+
+  if (bytes.length > MAX_IMAGE_BYTES) {
+    throw new Error(`Image is ${(bytes.length / 1048576).toFixed(1)} MB; the limit is ${MAX_IMAGE_BYTES / 1048576} MB`);
+  }
+  return classifyImage(bytes, src);
+}
+
+// Figma's createImage accepts PNG, JPEG and GIF only. SVG is vector markup and
+// becomes real vector nodes instead of an image fill.
+function classifyImage(bytes, src) {
+  const has = (sig, at = 0) => sig.every((b, i) => bytes[at + i] === b);
+  if (has([0x89, 0x50, 0x4e, 0x47])) return { format: 'png', base64: bytes.toString('base64') };
+  if (has([0xff, 0xd8, 0xff])) return { format: 'jpeg', base64: bytes.toString('base64') };
+  if (has([0x47, 0x49, 0x46, 0x38])) return { format: 'gif', base64: bytes.toString('base64') };
+  const head = bytes.subarray(0, 1024).toString('utf8').trimStart();
+  if (/^(<\?xml[^>]*>\s*)?(<!--[\s\S]*?-->\s*)*(<!DOCTYPE svg[^>]*>\s*)?<svg[\s>]/i.test(head)) {
+    return { format: 'svg', svg: bytes.toString('utf8') };
+  }
+  const kind = has([0x52, 0x49, 0x46, 0x46]) && has([0x57, 0x45, 0x42, 0x50], 8) ? 'WebP' : 'an unknown format';
+  throw new Error(`${src.slice(0, 120)} is ${kind}; Figma only accepts PNG, JPEG, GIF (or SVG as vectors)`);
+}
+
+// figma_build specs may carry `image: <path | url | data URI>`. Resolve each
+// distinct source once, then hand the plugin raw bytes it can use directly.
+async function resolveBuildImages(specs) {
+  const cache = new Map();
+  const load = (src) => {
+    if (!cache.has(src)) cache.set(src, loadImageSource(src));
+    return cache.get(src);
+  };
+  const walk = async (spec) => {
+    if (!spec || typeof spec !== 'object') return;
+    if (spec.image !== undefined) {
+      const img = await load(spec.image);
+      const label = spec.name || spec.image;
+      if (img.format === 'svg') {
+        const type = String(spec.type || 'FRAME').toUpperCase();
+        if (type !== 'IMAGE' && type !== 'SVG') {
+          throw new Error(`${label}: SVG files cannot be an image fill; use {"type":"IMAGE","image":...} to place it as vectors`);
+        }
+        spec.type = 'SVG';
+        spec.svg = img.svg;
+      } else {
+        spec.imageData = img.base64;
+      }
+      delete spec.image;
+    }
+    await Promise.all((spec.children || []).map(walk));
+  };
+  await Promise.all(specs.map(walk));
+}
+
 // ------------------------------------------------------------------- MCP side
 
 const EXEC_DESCRIPTION = `Run JavaScript inside the open Figma file with full Plugin API access.
@@ -252,7 +335,7 @@ so the user watches it being assembled; the viewport follows the build. All font
 Returns {rootIds, count, nodes:[{id,name,type}]}.
 
 Node spec (every field optional except where noted):
-  type: FRAME (default) | TEXT | RECTANGLE | ELLIPSE | LINE | SVG | COMPONENT | INSTANCE | POLYGON | STAR
+  type: FRAME (default) | TEXT | RECTANGLE | ELLIPSE | LINE | SVG | IMAGE | COMPONENT | INSTANCE | POLYGON | STAR
   name, x, y (ignored inside auto-layout unless position:"absolute"), width, height
     width/height: number (fixed) | "hug" | "fill" (fill needs an auto-layout parent)
   fill: "#hex" | "#RRGGBBAA" | {gradient:["#a","#b"], angle:180} | [paints] | "none"
@@ -267,6 +350,10 @@ Node spec (every field optional except where noted):
     color: "#hex", textCase: upper|lower|title, textDecoration: underline|strikethrough
     A text with width "fill" or a number wraps; otherwise it grows to fit.
   SVG: svg: "<svg ...>" markup
+  image: local file path | https URL | data URI — PNG/JPEG/GIF image fill on any shape or frame,
+    layered over \`fill\`. imageScale: fill (default) | fit | crop | tile. A node with an image and
+    no width/height takes the image's natural size; with one of them, it keeps the aspect ratio.
+    type IMAGE is a rectangle for a plain picture; an .svg source there becomes vector nodes.
   INSTANCE: componentId or componentKey, properties: {variant/prop overrides}
   position: "absolute" — ignore parent auto layout; index — insert position within the parent
   props: {anyPluginApiProperty: value} — raw escape hatch applied last
@@ -323,6 +410,40 @@ const TOOLS = [
         code: { type: 'string', description: 'JavaScript to run. Use `return` to send data back.' },
       },
       required: ['code'],
+    },
+  },
+  {
+    name: 'figma_upload_image',
+    description:
+      'Place an image into the open Figma file from a local file path, an http(s) URL, or a data URI. ' +
+      'PNG, JPEG and GIF become an image fill (a new rectangle at natural size, or applied to nodeId); ' +
+      'SVG becomes editable vector nodes. Figma rejects bitmaps larger than 4096px on either edge. ' +
+      'Returns {id, name, type, x, y, width, height, imageHash, naturalWidth, naturalHeight}.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        source: {
+          type: 'string',
+          description: 'Absolute or ~ path on this machine, an http(s) URL, or a data:image/... URI.',
+        },
+        nodeId: {
+          type: 'string',
+          description: 'Set the image as the fill of this existing shape or frame instead of creating a new node.',
+        },
+        parentId: { type: 'string', description: 'Append the new node into this node. Defaults to the current page.' },
+        name: { type: 'string', description: 'Layer name. Defaults to the file name.' },
+        x: { type: 'number' },
+        y: { type: 'number' },
+        width: { type: 'number', description: 'Only width given: height follows the aspect ratio.' },
+        height: { type: 'number', description: 'Only height given: width follows the aspect ratio.' },
+        scaleMode: {
+          type: 'string',
+          enum: ['fill', 'fit', 'crop', 'tile'],
+          description: 'How the image sits inside its box. Default fill.',
+        },
+        focus: { type: 'boolean', description: 'Scroll to and select the result. Default true.' },
+      },
+      required: ['source'],
     },
   },
   {
@@ -427,6 +548,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req, extra) => {
   try {
     switch (name) {
       case 'figma_build':
+        await resolveBuildImages(args.nodes || (args.node ? [args.node] : []));
         return text(
           await call(
             'build',
@@ -443,6 +565,29 @@ server.setRequestHandler(CallToolRequestSchema, async (req, extra) => {
 
       case 'figma_exec':
         return text(await call('exec', { code: args.code }, onProgress));
+
+      case 'figma_upload_image': {
+        const img = await loadImageSource(args.source);
+        // A new layer is named after its file; an existing node keeps its name.
+        const fileName = args.nodeId || /^(data:|https?:\/\/)/i.test(args.source)
+          ? undefined
+          : args.source.split(/[\\/]/).pop().replace(/\.[^.]+$/, '');
+        return text(
+          await call('place_image', {
+            base64: img.base64,
+            svg: img.svg,
+            nodeId: args.nodeId,
+            parentId: args.parentId,
+            name: args.name || fileName,
+            x: args.x,
+            y: args.y,
+            width: args.width,
+            height: args.height,
+            scaleMode: args.scaleMode,
+            focus: args.focus,
+          })
+        );
+      }
 
       case 'figma_screenshot': {
         const r = await call('screenshot', { nodeId: args.nodeId, scale: args.scale, maxSize: args.maxSize });

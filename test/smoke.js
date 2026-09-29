@@ -1,6 +1,9 @@
 // Smoke test: drives the MCP server over stdio while a fake plugin answers on
 // the WebSocket side. Verifies the full request path without needing Figma open.
 import { spawn } from 'node:child_process';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { WebSocket } from 'ws';
 
 const PORT = 3199;
@@ -58,7 +61,7 @@ srv.stdin.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initiali
 
 const tools = await rpc('tools/list', {});
 const names = tools.result.tools.map((t) => t.name);
-check('tools/list returns all 9 tools', names.length === 9, names.join(', '));
+check('tools/list returns all 10 tools', names.length === 10, names.join(', '));
 
 // --- disconnected state ----------------------------------------------------
 const offline = await rpc('tools/call', { name: 'figma_status', arguments: {} });
@@ -99,10 +102,23 @@ ws.on('message', (raw) => {
       ws.send(JSON.stringify({ type: 'progress', id, done, total: 5, message: 'node ' + done }));
       if (done === 5) {
         clearInterval(tick);
-        reply(true, { data: { rootIds: ['9:1'], count: params.node.children.length + 1 } });
+        reply(true, {
+          data: { rootIds: ['9:1'], count: params.node.children.length + 1, imageData: params.node.imageData },
+        });
       }
     }, 250);
     return;
+  }
+  if (command === 'place_image') {
+    return reply(true, {
+      data: {
+        id: '7:1',
+        type: params.svg ? 'FRAME' : 'RECTANGLE',
+        name: params.name,
+        gotBase64: params.base64 || null,
+        gotSvg: !!params.svg,
+      },
+    });
   }
   if (command === 'get_pages') return reply(true, { data: [{ id: '0:1', name: 'Page 1', isCurrent: true }] });
   if (command === 'get_metadata') return reply(true, { data: { id: '0:1', type: 'PAGE', children: [] } });
@@ -162,6 +178,69 @@ check(
   progress.length === 5 && progress[4].params.progress === 5 && progress[4].params.total === 5,
   progress.map((n) => n.params.progress).join(',')
 );
+
+// --- images ---------------------------------------------------------------
+const PNG_1PX =
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+const tmp = mkdtempSync(join(tmpdir(), 'figma-mcp-smoke-'));
+writeFileSync(join(tmp, 'dot.png'), Buffer.from(PNG_1PX, 'base64'));
+writeFileSync(join(tmp, 'logo.svg'), '<?xml version="1.0"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"/>');
+writeFileSync(join(tmp, 'notes.txt'), 'hello');
+
+const upFile = await rpc('tools/call', {
+  name: 'figma_upload_image',
+  arguments: { source: join(tmp, 'dot.png') },
+});
+const upFileData = JSON.parse(upFile.result.content[0].text);
+check(
+  'figma_upload_image reads a local PNG and names the layer after the file',
+  !upFile.result.isError && upFileData.gotBase64 === PNG_1PX && upFileData.name === 'dot',
+  upFile.result.content[0].text.slice(0, 120)
+);
+
+const upData = await rpc('tools/call', {
+  name: 'figma_upload_image',
+  arguments: { source: 'data:image/png;base64,' + PNG_1PX, name: 'Pixel' },
+});
+check(
+  'figma_upload_image accepts a data URI',
+  !upData.result.isError && JSON.parse(upData.result.content[0].text).gotBase64 === PNG_1PX
+);
+
+const upSvg = await rpc('tools/call', {
+  name: 'figma_upload_image',
+  arguments: { source: join(tmp, 'logo.svg') },
+});
+check('figma_upload_image sends SVG as vector markup', JSON.parse(upSvg.result.content[0].text).gotSvg === true);
+
+const upBad = await rpc('tools/call', {
+  name: 'figma_upload_image',
+  arguments: { source: join(tmp, 'notes.txt') },
+});
+check(
+  'figma_upload_image rejects formats Figma cannot import',
+  upBad.result.isError === true && upBad.result.content[0].text.includes('PNG, JPEG, GIF')
+);
+
+const upMissing = await rpc('tools/call', {
+  name: 'figma_upload_image',
+  arguments: { source: join(tmp, 'nope.png') },
+});
+check(
+  'figma_upload_image reports a missing file clearly',
+  upMissing.result.isError === true && upMissing.result.content[0].text.includes('ENOENT')
+);
+
+const buildImg = await rpc('tools/call', {
+  name: 'figma_build',
+  arguments: { node: { name: 'Hero', image: join(tmp, 'dot.png'), children: [] } },
+});
+check(
+  'figma_build resolves `image` to bytes before reaching the plugin',
+  !buildImg.result.isError && JSON.parse(buildImg.result.content[0].text).imageData === PNG_1PX,
+  buildImg.result.content[0].text.slice(0, 120)
+);
+rmSync(tmp, { recursive: true, force: true });
 
 const pages = await rpc('tools/call', { name: 'figma_get_pages', arguments: {} });
 check('figma_get_pages lists pages', pages.result.content[0].text.includes('Page 1'));
